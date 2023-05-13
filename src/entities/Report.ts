@@ -6,11 +6,11 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Student } from "./student.entity";
+import { Student } from "./Student";
 
-@Index("note_fk0", ["idStudent"], {})
-@Entity("note", { schema: "toeic_exam" })
-export class Note {
+@Index("report_fk0", ["idStudent"], {})
+@Entity("report", { schema: "toeic_exam" })
+export class Report {
   @PrimaryGeneratedColumn({ type: "int", name: "id" })
   id: number;
 
@@ -29,7 +29,7 @@ export class Note {
   @Column("datetime", { name: "updated_at" })
   updatedAt: Date;
 
-  @ManyToOne(() => Student, (student) => student.notes, {
+  @ManyToOne(() => Student, (student) => student.reports, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })

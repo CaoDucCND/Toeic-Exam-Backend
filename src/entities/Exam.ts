@@ -1,6 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { FullTest } from "./fullTest.entity";
-import { Part } from "./part.entity";
+import { FullTest } from "./FullTest";
+import { Part } from "./Part";
 
 @Entity("exam", { schema: "toeic_exam" })
 export class Exam {

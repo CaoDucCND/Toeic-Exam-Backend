@@ -7,10 +7,10 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Exam } from "./exam.entity";
-import { PartParagraph } from "./partParagraph.entity";
-import { PartQuestion } from "./partQuestion.entity";
-import { SkillTest } from "./skillTest.entity";
+import { Exam } from "./Exam";
+import { PartParagraph } from "./PartParagraph";
+import { PartQuestion } from "./PartQuestion";
+import { SkillTest } from "./SkillTest";
 
 @Index("part_fk0", ["examId"], {})
 @Entity("part", { schema: "toeic_exam" })

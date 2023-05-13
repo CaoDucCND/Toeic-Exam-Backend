@@ -11,9 +11,9 @@ export const DatabaseProviders = [
                 username: 'duccao',
                 password: 'AVNS_0DlAkoOltYDWD0wPDzX',
                 database: 'toeic_exam',
-                entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+                entities: [__dirname + '/../**/*{.ts,.js}'],
                 migrations: ['src/migrations/*.ts', 'dist/migrations/*{.ts,.js}'],
-                synchronize: true,
+                synchronize: false,
             });
             return dataSource.initialize();
         },

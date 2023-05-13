@@ -6,16 +6,16 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Student } from "./student.entity";
+import { Admin } from "./Admin";
 
-@Index("report_fk0", ["idStudent"], {})
-@Entity("report", { schema: "toeic_exam" })
-export class Report {
+@Index("blog_fk0", ["idAdmin"], {})
+@Entity("blog", { schema: "toeic_exam" })
+export class Blog {
   @PrimaryGeneratedColumn({ type: "int", name: "id" })
   id: number;
 
-  @Column("int", { name: "id_student" })
-  idStudent: number;
+  @Column("int", { name: "id_admin" })
+  idAdmin: number;
 
   @Column("varchar", { name: "title", length: 255 })
   title: string;
@@ -26,13 +26,13 @@ export class Report {
   @Column("datetime", { name: "create_at" })
   createAt: Date;
 
-  @Column("datetime", { name: "updated_at" })
-  updatedAt: Date;
+  @Column("int", { name: "updated_at" })
+  updatedAt: number;
 
-  @ManyToOne(() => Student, (student) => student.reports, {
+  @ManyToOne(() => Admin, (admin) => admin.blogs, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
-  @JoinColumn([{ name: "id_student", referencedColumnName: "id" }])
-  idStudent2: Student;
+  @JoinColumn([{ name: "id_admin", referencedColumnName: "id" }])
+  idAdmin2: Admin;
 }

@@ -5,7 +5,7 @@ import { UpdateExamDto } from './dto/update-exam.dto';
 
 @Controller('exam')
 export class ExamController {
-  constructor(private readonly examService: ExamService) {}
+  constructor(private readonly examService: ExamService) { }
 
   @Post()
   create(@Body() createExamDto: CreateExamDto) {
@@ -13,7 +13,7 @@ export class ExamController {
   }
 
   @Get()
-  findAll() {
+  findAll(): Promise<any> {
     return this.examService.findAll();
   }
 

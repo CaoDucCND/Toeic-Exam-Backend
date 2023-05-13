@@ -1,5 +1,5 @@
 import { DataSource } from "typeorm";
-import { Exam } from "../../entities/exam.entity";
+import { Exam } from "../../entities/Exam";
 
 export const ExamProviders = [
     {

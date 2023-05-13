@@ -7,8 +7,8 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { PartParagraph } from "./partParagraph.entity";
-import { Question } from "./question.entity";
+import { PartParagraph } from "./PartParagraph";
+import { Question } from "./Question";
 
 @Index("paragraph_fk0", ["partParagraphId"], {})
 @Entity("paragraph", { schema: "toeic_exam" })

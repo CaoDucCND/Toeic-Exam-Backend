@@ -7,12 +7,13 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Chat } from "./chat.entity";
-import { Feedback } from "./feedback.entity";
-import { Note } from "./note.entity";
-import { Ranking } from "./ranking.entity";
-import { Report } from "./report.entity";
-import { Account } from "./account.entity";
+import { Chat } from "./Chat";
+import { Feedback } from "./Feedback";
+import { Note } from "./Note";
+import { Ranking } from "./Ranking";
+import { Report } from "./Report";
+import { Account } from "./Account";
+import { StudentAnswer } from "./StudentAnswer";
 
 @Index("student_fk0", ["idAccount"], {})
 @Entity("student", { schema: "toeic_exam" })
@@ -59,4 +60,7 @@ export class Student {
   })
   @JoinColumn([{ name: "id_account", referencedColumnName: "id" }])
   idAccount2: Account;
+
+  @OneToMany(() => StudentAnswer, (studentAnswer) => studentAnswer.student)
+  studentAnswers: StudentAnswer[];
 }

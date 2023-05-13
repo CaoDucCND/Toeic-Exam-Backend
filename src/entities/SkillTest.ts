@@ -6,11 +6,11 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Test } from "./test.entity";
-import { Part } from "./part.entity";
+import { Part } from "./Part";
+import { Test } from "./Test";
 
-@Index("skill_test_fk0", ["testId"], {})
 @Index("skill_test_fk1", ["partId"], {})
+@Index("skill_test_fk0", ["testId"], {})
 @Entity("skill_test", { schema: "toeic_exam" })
 export class SkillTest {
   @PrimaryGeneratedColumn({ type: "int", name: "id" })
@@ -22,17 +22,17 @@ export class SkillTest {
   @Column("int", { name: "part_id" })
   partId: number;
 
-  @ManyToOne(() => Test, (test) => test.skillTests, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
-  })
-  @JoinColumn([{ name: "test_id", referencedColumnName: "id" }])
-  test: Test;
-
   @ManyToOne(() => Part, (part) => part.skillTests, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "part_id", referencedColumnName: "id" }])
   part: Part;
+
+  @ManyToOne(() => Test, (test) => test.skillTests, {
+    onDelete: "NO ACTION",
+    onUpdate: "NO ACTION",
+  })
+  @JoinColumn([{ name: "test_id", referencedColumnName: "id" }])
+  test: Test;
 }

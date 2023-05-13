@@ -6,7 +6,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Student } from "./student.entity";
+import { Student } from "./Student";
 
 @Index("feedback_fk0", ["idStudent"], {})
 @Entity("feedback", { schema: "toeic_exam" })

@@ -1,6 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Admin } from "./admin.entity";
-import { Student } from "./student.entity";
+import { Admin } from "./Admin";
+import { Student } from "./Student";
 
 @Entity("account", { schema: "toeic_exam" })
 export class Account {

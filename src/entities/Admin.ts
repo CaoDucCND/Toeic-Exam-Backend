@@ -7,9 +7,9 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Account } from "./account.entity";
-import { Blog } from "./blog.entity";
-import { Chat } from "./chat.entity";
+import { Account } from "./Account";
+import { Blog } from "./Blog";
+import { Chat } from "./Chat";
 
 @Index("admin_fk0", ["idAccount"], {})
 @Entity("admin", { schema: "toeic_exam" })

@@ -6,9 +6,9 @@ import {
   ManyToOne,
   OneToMany,
 } from "typeorm";
-import { Student } from "./student.entity";
-import { Admin } from "./admin.entity";
-import { ChatDetail } from "./chatDetail.entity";
+import { Student } from "./Student";
+import { Admin } from "./Admin";
+import { ChatDetail } from "./ChatDetail";
 
 @Index("chat_fk1", ["idAdmin"], {})
 @Entity("chat", { schema: "toeic_exam" })

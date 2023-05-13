@@ -1,7 +1,8 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { FullTest } from "./fullTest.entity";
-import { Ranking } from "./ranking.entity";
-import { SkillTest } from "./skillTest.entity";
+import { FullTest } from "./FullTest";
+import { Ranking } from "./Ranking";
+import { SkillTest } from "./SkillTest";
+import { StudentAnswer } from "./StudentAnswer";
 
 @Entity("test", { schema: "toeic_exam" })
 export class Test {
@@ -34,4 +35,7 @@ export class Test {
 
   @OneToMany(() => SkillTest, (skillTest) => skillTest.test)
   skillTests: SkillTest[];
+
+  @OneToMany(() => StudentAnswer, (studentAnswer) => studentAnswer.test)
+  studentAnswers: StudentAnswer[];
 }
