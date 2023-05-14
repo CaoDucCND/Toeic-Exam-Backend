@@ -43,6 +43,8 @@ export class ExamService {
       'partQuestion.partId',
       'paragraph.content',
       'paragraphQuestion.id',
+      'paragraphQuestion.numQuestion',
+      'partQuestionQuestion.numQuestion',
       'paragraphQuestion.correctAnswer',
       'paragraphOptionAnswer.value',
       'paragraphOptionAnswer.content',

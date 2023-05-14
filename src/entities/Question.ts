@@ -28,6 +28,8 @@ export class Question {
 
   @Column("text", { name: "content", nullable: true })
   content: string | null;
+  @Column({ type: "int", name: "num_question" })
+  numQuestion: number;
 
   @Column("varchar", { name: "correct_answer", length: 255 })
   correctAnswer: string;
