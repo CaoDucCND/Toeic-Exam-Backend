@@ -14,7 +14,7 @@ export class ToeicTestService {
         }
     }
 
-    async getTestById(id: number): Promise<any> {
+    async getFullTestById(id: number): Promise<any> {
 
         const exam = await this.examService.findOne(id);
 

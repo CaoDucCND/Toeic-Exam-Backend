@@ -8,13 +8,19 @@ export class ToeicTestController {
   async getFullTest() {
     return this.toeicTestService.getFullTest();
   }
+
+  @Get('/full-test/:id')
+  async getFullTestById(@Param('id') id: string) {
+    return this.toeicTestService.getFullTestById(+id);
+  }
+
   @Get('/skill-test/:name')
-  async getTestById(@Param('name') name: string) {
+  async getListPart(@Param('name') name: string) {
     return this.toeicTestService.getTestByPartName(name);
   }
 
   @Get('/skill-test/:name/:id')
-  findPartById(@Param('name') name: string, @Param('id') id: string) {
+  getDetailPart(@Param('name') name: string, @Param('id') id: string) {
     return this.toeicTestService.getPartById(name, +id);
   }
   // @Get('/skill-test')
