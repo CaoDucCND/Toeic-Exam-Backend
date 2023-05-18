@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ToeicTestService } from './toeic_test.service';
 
 @Controller('tests')
@@ -8,6 +8,12 @@ export class ToeicTestController {
   async getFullTest() {
     return this.toeicTestService.getFullTest();
   }
+
+  @Post('/full-test/result/:id')
+  async getFullTestMark(@Param('id') id: string, @Body() body: any) {
+    return this.toeicTestService.getFullTestMark(+id, body);
+  }
+
 
   @Get('/full-test/:id')
   async getFullTestById(@Param('id') id: string) {
@@ -23,5 +29,4 @@ export class ToeicTestController {
   getDetailPart(@Param('name') name: string, @Param('id') id: string) {
     return this.toeicTestService.getPartById(name, +id);
   }
-  // @Get('/skill-test')
 }
