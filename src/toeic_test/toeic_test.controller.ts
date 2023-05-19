@@ -8,11 +8,17 @@ export class ToeicTestController {
   async getFullTest() {
     return this.toeicTestService.getFullTest();
   }
-
+  //luu dư lieu
   @Post('/full-test/result/:id')
-  async getFullTestMark(@Param('id') id: string, @Body() body: any) {
+  async saveResult(@Param('id') id: string, @Body() body: any) {
     console.log("result");
-    return this.toeicTestService.getFullTestMark(+id, body);
+    return this.toeicTestService.saveResult(+id, body);
+  }
+  //lay dulieu
+  @Get('/full-test/result/:id')
+  async getFullTestMark(@Param('id') id: string) {
+    console.log("result");
+    return this.toeicTestService.getFullTestResult(+id);
   }
 
   @Get('/full-test/result/:id/detail')

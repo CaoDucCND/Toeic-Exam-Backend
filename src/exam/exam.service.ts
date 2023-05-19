@@ -289,6 +289,75 @@ export class ExamService {
     return cleanedData;
   }
 
+
+  async getResultFullTestById(id: number): Promise<any> {
+    const resultStudent = await this.examRepository.createQueryBuilder('exam')
+      .leftJoinAndSelect('exam.fullTests', 'fullTest')
+      .leftJoinAndSelect('fullTest.test', 'test')
+      .leftJoinAndSelect('exam.parts', 'part')
+      .leftJoinAndSelect('part.partParagraphs', 'partParagraph', 'part.typePart = :partParagraphType', { partParagraphType: 'PART_PARAGRAPH' })
+      .leftJoinAndSelect('part.partQuestions', 'partQuestion', 'part.typePart = :partQuestionType', { partQuestionType: 'PART_QUESTION' })
+      .leftJoinAndSelect('partParagraph.paragraphs', 'paragraph')
+      .leftJoinAndSelect('paragraph.questions', 'paragraphQuestion')
+      .leftJoinAndSelect('partQuestion.questions', 'partQuestionQuestion')
+      .leftJoinAndSelect('paragraphQuestion.studentAnswers',
+        'paragraphQuestionStudentAnswer')
+      .leftJoinAndSelect('partQuestionQuestion.studentAnswers', 'partQuestionStudentAnswer')
+
+      .where('exam.id = :id', { id: id })
+      .select(['exam.id',
+        'fullTest.id',
+        'test.id',
+        'test.typeOfTest',
+        'test.timeStart',
+        'test.timeEnd',
+        'part.name',
+        'partParagraph.partId',
+        'partQuestion.partId',
+        'paragraph.content',
+        'paragraphQuestion.id',
+        'paragraphQuestion.numQuestion',
+        'partQuestionQuestion.numQuestion',
+        'paragraphQuestionStudentAnswer.selectedAnswer',
+        'partQuestionStudentAnswer.selectedAnswer',
+      ])
+      .getOne();
+
+    const partsInResult = resultStudent.parts;
+    const dataResult = {
+      type: resultStudent.fullTests[0].test.typeOfTest,
+      idTest: resultStudent.fullTests[0].test.id,
+      timeStart: resultStudent.fullTests[0].test.timeStart,
+      timeEnd: resultStudent.fullTests[0].test.timeEnd,
+      userResult: []
+    }
+    // const 
+
+    partsInResult.forEach(part => {
+      part.partQuestions.forEach(partQuestion => {
+        partQuestion.questions.forEach(question => {
+          dataResult.userResult.push({
+            number: question.numQuestion,
+            result: question.studentAnswers[0]?.selectedAnswer || null
+          });
+        });
+      });
+
+      part.partParagraphs.forEach(paragraph => {
+        paragraph.paragraphs.forEach(paragraphQuestion => {
+          paragraphQuestion.questions.forEach(question => {
+            dataResult.userResult.push({
+              number: question.numQuestion,
+              result: question.studentAnswers[0]?.selectedAnswer || null
+            });
+          });
+        });
+      });
+    });
+
+    return dataResult;
+  }
+
   async findAll(): Promise<Exam[]> {
     return this.examRepository.find();
   }
