@@ -1,28 +1,15 @@
-import {
-  Column,
-  Entity,
-  Index,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Chat } from "./Chat";
 import { Feedback } from "./Feedback";
 import { Note } from "./Note";
 import { Ranking } from "./Ranking";
 import { Report } from "./Report";
-import { Account } from "./Account";
 import { StudentAnswer } from "./StudentAnswer";
 
-@Index("student_fk0", ["idAccount"], {})
 @Entity("student", { schema: "toeic_exam" })
 export class Student {
   @PrimaryGeneratedColumn({ type: "int", name: "id" })
   id: number;
-
-  @Column("int", { name: "id_account" })
-  idAccount: number;
 
   @Column("varchar", { name: "username", length: 255 })
   username: string;
@@ -53,13 +40,6 @@ export class Student {
 
   @OneToMany(() => Report, (report) => report.idStudent2)
   reports: Report[];
-
-  @ManyToOne(() => Account, (account) => account.students, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
-  })
-  @JoinColumn([{ name: "id_account", referencedColumnName: "id" }])
-  idAccount2: Account;
 
   @OneToMany(() => StudentAnswer, (studentAnswer) => studentAnswer.student)
   studentAnswers: StudentAnswer[];

@@ -5,9 +5,11 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { Assets } from "./Assets";
+import { DetailAnswer } from "./DetailAnswer";
 import { OptionAnswer } from "./OptionAnswer";
 import { Paragraph } from "./Paragraph";
 import { PartQuestion } from "./PartQuestion";
@@ -28,14 +30,18 @@ export class Question {
 
   @Column("text", { name: "content", nullable: true })
   content: string | null;
-  @Column({ type: "int", name: "num_question" })
-  numQuestion: number;
 
   @Column("varchar", { name: "correct_answer", length: 255 })
   correctAnswer: string;
 
+  @Column("int", { name: "num_question", nullable: true })
+  numQuestion: number | null;
+
   @OneToMany(() => Assets, (assets) => assets.idQuestion2)
   assets: Assets[];
+
+  @OneToOne(() => DetailAnswer, (detailAnswer) => detailAnswer.question)
+  detailAnswer: DetailAnswer;
 
   @OneToMany(() => OptionAnswer, (optionAnswer) => optionAnswer.question)
   optionAnswers: OptionAnswer[];

@@ -11,7 +11,13 @@ export class ToeicTestController {
 
   @Post('/full-test/result/:id')
   async getFullTestMark(@Param('id') id: string, @Body() body: any) {
+    console.log("result");
     return this.toeicTestService.getFullTestMark(+id, body);
+  }
+
+  @Get('/full-test/result/:id/detail')
+  async getFullTestResultDetail(@Param('id') id: string) {
+    return this.toeicTestService.getDetailAswerByExamId(+id);
   }
 
 

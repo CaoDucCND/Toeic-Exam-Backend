@@ -5,6 +5,18 @@ import { ExamService } from 'src/exam/exam.service';
 export class ToeicTestService {
     constructor(private examService: ExamService) { }
 
+
+
+  async  getDetailAswerByExamId(id: number) {
+        console.log(id);
+        const res = await this.examService.getDetailAswerByExamId(id);
+        return {
+            statusCode: 200,
+            message: 'Get detil Answer test successfully',
+            data: res ? res : []
+        }
+    }
+
     async getFullTest(): Promise<any> {
         const listExam = await this.examService.findAll();
         return {

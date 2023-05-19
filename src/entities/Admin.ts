@@ -1,31 +1,17 @@
-import {
-  Column,
-  Entity,
-  Index,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from "typeorm";
-import { Account } from "./Account";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Blog } from "./Blog";
 import { Chat } from "./Chat";
 
-@Index("admin_fk0", ["idAccount"], {})
 @Entity("admin", { schema: "toeic_exam" })
 export class Admin {
   @PrimaryGeneratedColumn({ type: "int", name: "id" })
   id: number;
 
-  @Column("int", { name: "id_account" })
-  idAccount: number;
+  @Column("varchar", { name: "email", nullable: true, length: 100 })
+  email: string | null;
 
-  @ManyToOne(() => Account, (account) => account.admins, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
-  })
-  @JoinColumn([{ name: "id_account", referencedColumnName: "id" }])
-  idAccount2: Account;
+  @Column("text", { name: "password", nullable: true })
+  password: string | null;
 
   @OneToMany(() => Blog, (blog) => blog.idAdmin2)
   blogs: Blog[];
