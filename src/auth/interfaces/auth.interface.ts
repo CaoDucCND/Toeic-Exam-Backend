@@ -4,7 +4,6 @@ interface AuthResponse {
     userId: number;
     access_token: string;
     userName: string;
-    avatarURL: string;
-    payment: 'free' | 'paid';
+    email: string;
   };
 }

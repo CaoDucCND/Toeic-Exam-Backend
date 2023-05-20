@@ -26,6 +26,9 @@ export class Student {
   @Column("int", { name: "dob", nullable: true })
   dob: number | null;
 
+  @Column("tinyint", { name: "is_active" })
+  isActive: number;
+
   @OneToMany(() => Chat, (chat) => chat.idStudent2)
   chats: Chat[];
 

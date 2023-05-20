@@ -13,6 +13,7 @@ export class MailingService {
 
     private async setTransport() {
         const OAuth2 = google.auth.OAuth2;
+        console.log("check client id", this.configService.get('CLIENT_ID'));
         const oauth2Client = new OAuth2(
             this.configService.get('CLIENT_ID'),
             this.configService.get('CLIENT_SECRET'),
@@ -46,6 +47,7 @@ export class MailingService {
     }
     public async sendMail(email: string, subject: string, content: string) {
         await this.setTransport();
+        console.log("email send", email);
         this.mailerService
             .sendMail({
                 transporterName: 'gmail',
@@ -60,7 +62,7 @@ export class MailingService {
             })
             .catch((err) => {
                 console.log(err);
+                throw new Error('Failed to send email');
             });
     }
-
 }
