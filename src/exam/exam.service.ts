@@ -1,10 +1,12 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateExamDto } from './dto/create-exam.dto';
 import { UpdateExamDto } from './dto/update-exam.dto';
 import { Exam } from "../entities/Exam";
 import { Repository } from 'typeorm';
 import { PartParagraph } from 'src/entities/PartParagraph';
 import { PartQuestion } from 'src/entities/PartQuestion';
+import { Question } from 'src/entities/Question';
+import { Part } from 'src/entities/Part';
 
 
 interface ExamWithPartName {
@@ -48,8 +50,8 @@ function formatPartName(partName) {
 }
 @Injectable()
 export class ExamService {
-  constructor(@Inject('EXAM_REPOSITORY') private examRepository: Repository<Exam>
-    // @Inject('TEST_REPOSITORY') private partParagraphRepository: Repository<PartParagraph>,
+  constructor(@Inject('EXAM_REPOSITORY') private examRepository: Repository<Exam>,
+    @Inject('PART_REPOSITORY') private partRepository: Repository<Part>,
   ) { }
 
 
@@ -190,6 +192,9 @@ export class ExamService {
 
     return { cleanedDataResultDetail, cleanedDataPartsInResult };
   }
+
+
+
   async getPartById(name: string, id: number): Promise<any> {
     const nameFormated = formatPartName(name);
     const columnSelectAdvance = [...columnSelect, 'part.id'];
@@ -412,10 +417,8 @@ export class ExamService {
       .leftJoinAndSelect('partParagraph.paragraphs', 'paragraph')
       .leftJoinAndSelect('paragraph.questions', 'paragraphQuestion')
       .leftJoinAndSelect('partQuestion.questions', 'partQuestionQuestion')
-      .leftJoinAndSelect('paragraphQuestion.studentAnswers',
-        'paragraphQuestionStudentAnswer')
+      .leftJoinAndSelect('paragraphQuestion.studentAnswers', 'paragraphQuestionStudentAnswer')
       .leftJoinAndSelect('partQuestionQuestion.studentAnswers', 'partQuestionStudentAnswer')
-
       .where('exam.id = :id', { id: id })
       .select(['exam.id',
         'exam.name',
@@ -436,16 +439,21 @@ export class ExamService {
       ])
       .getOne();
 
+    console.log(' result student', resultStudent.fullTests[0]);
+
+    if (!resultStudent.fullTests.length) {
+      throw new NotFoundException('Not found result');
+    }
+
     const partsInResult = resultStudent.parts;
     const dataResult = {
-      name: resultStudent.name,
-      type: resultStudent.fullTests[0].test.typeOfTest,
-      idTest: resultStudent.fullTests[0].test.id,
-      timeStart: resultStudent.fullTests[0].test.timeStart,
-      timeEnd: resultStudent.fullTests[0].test.timeEnd,
+      name: resultStudent.name || null,
+      type: resultStudent.fullTests[0].test.typeOfTest || null,
+      idTest: resultStudent.fullTests[0].test.id || null,
+      timeStart: resultStudent.fullTests[0].test.timeStart || null,
+      timeEnd: resultStudent.fullTests[0].test.timeEnd || null,
       userResult: []
     }
-    // const 
 
     partsInResult.forEach(part => {
       part.partQuestions.forEach(partQuestion => {
@@ -470,6 +478,41 @@ export class ExamService {
     });
 
     return dataResult;
+
+  }
+
+  async getResultSkillTestById(id: number): Promise<any> {
+    const resultStudent = await this.partRepository.createQueryBuilder('part')
+      .leftJoinAndSelect('part.partParagraphs', 'partParagraph', 'part.typePart = :partParagraphType', { partParagraphType: 'PART_PARAGRAPH' })
+      .leftJoinAndSelect('part.partQuestions', 'partQuestion', 'part.typePart = :partQuestionType', { partQuestionType: 'PART_QUESTION' })
+      .leftJoinAndSelect('partParagraph.paragraphs', 'paragraph')
+      .leftJoinAndSelect('paragraph.questions', 'paragraphQuestion')
+      .leftJoinAndSelect('partQuestion.questions', 'partQuestionQuestion')
+      .leftJoinAndSelect('paragraphQuestion.studentAnswers', 'paragraphQuestionStudentAnswer')
+      .leftJoinAndSelect('partQuestionQuestion.studentAnswers', 'partQuestionStudentAnswer')
+      .leftJoinAndSelect('part.skillTests', 'skillTest', 'skillTest.partId = part.id')
+      .leftJoinAndSelect('skillTest.test', 'test')
+      .where('part.id = :id', { id: id })
+      // .select([
+
+      //   'fullTest.id',
+      //   'test.id',
+      //   'test.typeOfTest',
+      //   'test.timeStart',
+      //   'test.timeEnd',
+      //   'part.name',
+      //   'partParagraph.partId',
+      //   'partQuestion.partId',
+      //   'paragraph.content',
+      //   'paragraphQuestion.id',
+      //   'paragraphQuestion.numQuestion',
+      //   'partQuestionQuestion.numQuestion',
+      //   'paragraphQuestionStudentAnswer.selectedAnswer',
+      //   'partQuestionStudentAnswer.selectedAnswer',
+      // ])
+      .getOne();
+    return resultStudent;
+
   }
 
   async findAll(): Promise<Exam[]> {

@@ -16,7 +16,7 @@ export class ToeicTestController {
   }
   //lay dulieu
   @Get('/full-test/result/:id')
-  async getFullTestMark(@Param('id') id: string) {
+  async getFullTestResult(@Param('id') id: string) {
     console.log("result");
     return this.toeicTestService.getFullTestResult(+id);
   }
@@ -32,13 +32,38 @@ export class ToeicTestController {
     return this.toeicTestService.getFullTestById(+id);
   }
 
+  //SKILL TEST
+  @Get('/skill-test/result/:id')
+  async getSkillTestResult(@Param('id') id: string) {
+    console.log("result");
+    return this.toeicTestService.getSkillTestResult(+id);
+  }
+
+
+  @Post('/skill-test/result/:id')
+  async saveResultSkillTest(@Param('id') id: string, @Body() body: any) {
+    console.log("result");
+    return this.toeicTestService.saveResult(+id, body);
+  }
+  //lay dulieu
+
+
+  @Get('/skill-test/result/:id/detail')
+  async getSkillTestDetailResult(@Param('id') id: string) {
+    return this.toeicTestService.getSkillTestResultDetail(+id);
+  }
   @Get('/skill-test/:name')
   async getListPart(@Param('name') name: string) {
     return this.toeicTestService.getTestByPartName(name);
   }
 
+
+
   @Get('/skill-test/:name/:id')
   getDetailPart(@Param('name') name: string, @Param('id') id: string) {
     return this.toeicTestService.getPartById(name, +id);
   }
+
+
+
 }
