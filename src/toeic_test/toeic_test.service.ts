@@ -7,6 +7,7 @@ import { Student } from 'src/entities/Student';
 import { FullTest } from 'src/entities/FullTest';
 import { Exam } from 'src/entities/Exam';
 import { async } from 'rxjs';
+import { SkillTest } from 'src/entities/SkillTest';
 
 @Injectable()
 export class ToeicTestService {
@@ -15,6 +16,7 @@ export class ToeicTestService {
         @Inject('STUDENT_ANSWER_REPOSITORY') private studentAnswerRepository: Repository<StudentAnswer>,
         @Inject('TEST_REPOSITORY') private testRepository: Repository<Test>,
         @Inject('FULL_TEST_REPOSITORY') private fullTestRepository: Repository<FullTest>,
+        @Inject('SKILL_TEST_REPOSITORY') private skillTestRepository: Repository<SkillTest>,
     ) { }
 
 
@@ -66,6 +68,12 @@ export class ToeicTestService {
                 fullTest.examId = idTest;
                 await this.fullTestRepository.save(fullTest);
             }
+            if (type === 'SKILL_TEST') {
+                const skillTest = new SkillTest();
+                skillTest.testId = savedTest.id;
+                skillTest.partId = idTest;
+                await this.skillTestRepository.save(skillTest);
+            }
 
             for (const question of studentResult) {
                 const foundQuestion = await this.examService.getQuestionByExamIdAndNum(idTest, question.number);
@@ -87,6 +95,7 @@ export class ToeicTestService {
                 message: 'Result saved successfully.',
             };
         } catch (error) {
+            console.error(error);
             return {
                 statusCode: 500,
                 message: 'error saving result',

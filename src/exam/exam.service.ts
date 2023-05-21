@@ -192,6 +192,7 @@ export class ExamService {
   }
   async getPartById(name: string, id: number): Promise<any> {
     const nameFormated = formatPartName(name);
+    const columnSelectAdvance = [...columnSelect, 'part.id'];
     const res = await this.examRepository
       .createQueryBuilder('exam')
       .leftJoinAndSelect('exam.parts', 'part')
@@ -205,18 +206,10 @@ export class ExamService {
       .leftJoinAndSelect('paragraphQuestion.assets', 'paragraphAsset')
       .leftJoinAndSelect('partQuestionQuestion.assets', 'partQuestionAsset')
       // .select(['exam.id', 'exam.name', 'exam.description', 'part.id', 'part.name'])
-      .select(columnSelect)
+      .select(columnSelectAdvance)
       .where('part.name = :name', { name: nameFormated })
       .andWhere('exam.id = :id', { id })
       .getMany();
-
-    // const resFormated = res.flatMap(item =>
-    //   item.parts.map(part => ({
-    //     id: item.id,
-    //     name: `${part.name} - ${item.name}`,
-    //     description: item.description
-    //   }))
-    // );
     return res;
   }
   async findOne(id: number): Promise<any> {
