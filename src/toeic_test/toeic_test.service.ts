@@ -52,7 +52,7 @@ export class ToeicTestService {
     async saveResult(studentId: number, body: any): Promise<any> {
         try {
             const { type, idTest, userResult, timeStart, timeEnd } = body;
-            const studentResult = userResult[0];
+            const studentResult = userResult;
 
             const test = new Test();
             test.typeOfTest = type;
