@@ -50,44 +50,49 @@ export class ToeicTestService {
     }
 
     async saveResult(studentId: number, body: any): Promise<any> {
-        // const data = await this.examService.getCorrectAnswer(id);
-        const { type, idTest, userResult, timeStart, timeEnd } = body;
-        const studentResult = userResult[0];
-        // const studentAnswers = new StudentAnswer();
-        // studentAnswers.studentId = body.studentId;
-        // studentAnswers.testId = body.testId;
-        // studentAnswers.questionId = body.questionId;
-        // studentAnswers.selectedAnswer = body.selectedAnswer;
+        try {
+            const { type, idTest, userResult, timeStart, timeEnd } = body;
+            const studentResult = userResult[0];
 
-        const test = new Test();
-        console.log("type", type);
-        test.typeOfTest = type;
-        // test.id = idTest;
-        test.timeStart = new Date(timeStart);
-        test.timeEnd = new Date(timeEnd);
-        const savedTest = await this.testRepository.save(test);
-        console.log("savedTest", savedTest);
-        if (type === 'FULL_TEST') {
-            const fullTest = new FullTest();
-            fullTest.testId = savedTest.id;
-            fullTest.examId = idTest;
-            const savedFullTest = await this.fullTestRepository.save(fullTest);
-            console.log(savedFullTest);
+            const test = new Test();
+            test.typeOfTest = type;
+            test.timeStart = new Date(timeStart);
+            test.timeEnd = new Date(timeEnd);
+            const savedTest = await this.testRepository.save(test);
+
+            if (type === 'FULL_TEST') {
+                const fullTest = new FullTest();
+                fullTest.testId = savedTest.id;
+                fullTest.examId = idTest;
+                await this.fullTestRepository.save(fullTest);
+            }
+
+            for (const question of studentResult) {
+                const foundQuestion = await this.examService.getQuestionByExamIdAndNum(idTest, question.number);
+
+                if (!foundQuestion || foundQuestion.length === 0) {
+                    throw new Error(`Question with number ${question.number} not found.`);
+                }
+
+                const studentAnswer = new StudentAnswer();
+                studentAnswer.studentId = studentId;
+                studentAnswer.testId = savedTest.id;
+                studentAnswer.questionId = foundQuestion[0].questionId;
+                studentAnswer.selectedAnswer = question.result;
+                await this.studentAnswerRepository.save(studentAnswer);
+            }
+
+            return {
+                statusCode: 200,
+                message: 'Result saved successfully.',
+            };
+        } catch (error) {
+            return {
+                statusCode: 500,
+                message: 'error saving result',
+            };
         }
-        studentResult.forEach(async (question: any) => {
-            console.log("question", question.number);
-            const foundQuestion = await this.examService.getQuestionByExamIdAndNum(idTest, question.number);
-            const studentAnswer = new StudentAnswer();
-            studentAnswer.studentId = studentId;
-            studentAnswer.testId = savedTest.id;
-            studentAnswer.questionId = foundQuestion[0].questionId;
-            studentAnswer.selectedAnswer = question.result;
-            await this.studentAnswerRepository.save(studentAnswer);
-            console.log("foundQuestion", foundQuestion);
-        })
-
     }
-
 
 
     async getFullTestResult(id: number): Promise<any> {
