@@ -273,7 +273,7 @@ export class ToeicTestService {
             .leftJoinAndSelect('test.studentAnswers', 'studentAnswer') //
             .leftJoinAndSelect('studentAnswer.question', 'question') //
             .leftJoinAndSelect('question.detailAnswer', 'detailAnswer') //
-            .where('skillTest.id = :id', { id: skillTestId })
+            .where('test.id = :id', { id: skillTestId })
             .getOne();
         const dataResult = {
             answer: [],
