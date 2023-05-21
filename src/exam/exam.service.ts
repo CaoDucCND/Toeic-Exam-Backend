@@ -258,7 +258,7 @@ export class ExamService {
         'partQuestionQuestion.correctAnswer',
         'paragraphQuestion.correctAnswer',
       ])
-      .where('exam.id = :id', { id: 1 })
+      .where('exam.id = :id', { id: id })
       .getOne();
     const parts = data.parts;
     const cleanedData = [];
@@ -289,6 +289,125 @@ export class ExamService {
     return cleanedData;
   }
 
+  async getQuestionsByExamId(id: number): Promise<any> {
+    const data = await this.examRepository.createQueryBuilder('exam')
+      .leftJoinAndSelect('exam.parts', 'part')
+      .leftJoinAndSelect('part.partParagraphs', 'partParagraph', 'part.typePart = :partParagraphType', { partParagraphType: 'PART_PARAGRAPH' })
+      .leftJoinAndSelect('part.partQuestions', 'partQuestion', 'part.typePart = :partQuestionType', { partQuestionType: 'PART_QUESTION' })
+      .leftJoinAndSelect('partParagraph.paragraphs', 'paragraph')
+      .leftJoinAndSelect('paragraph.questions', 'paragraphQuestion')
+      .leftJoinAndSelect('partQuestion.questions', 'partQuestionQuestion')
+      .select(['exam.id',
+        'part.name',
+        'partParagraph.partId',
+        'partQuestion.partId',
+        'paragraph.content',
+        'paragraphQuestion.id',
+        'partQuestionQuestion.paragraphId',
+        'paragraphQuestion.numQuestion',
+        'paragraphQuestion.content',
+        'paragraphQuestion.correctAnswer',
+        'partQuestionQuestion.id',
+        'partQuestionQuestion.partQuestionId',
+        'partQuestionQuestion.numQuestion',
+        'partQuestionQuestion.content',
+        'partQuestionQuestion.correctAnswer',
+      ])
+      .where('exam.id = :id', { id: id })
+      .getOne();
+
+    const parts = data.parts;
+    const cleanedData = [];
+    parts.forEach(part => { // Duyệt qua mảng ban đầu
+      part.partQuestions.forEach(partQuestion => {
+        partQuestion.questions.forEach(question => {
+          cleanedData.push({
+            questionId: question.id,
+            partQuestionId: question.partQuestionId,
+            content: question.content,
+            numQuestion: question.numQuestion,
+            correctAnswer: question.correctAnswer
+          });
+        });
+      });
+
+      part.partParagraphs.forEach(paragraph => {
+        paragraph.paragraphs.forEach(paragraphQuestion => {
+          paragraphQuestion.questions.forEach(question => {
+            cleanedData.push({
+              questionId: question.id,
+              partParagraphId: question.paragraphId,
+              content: question.content,
+              numQuestion: question.numQuestion,
+              correctAnswer: question.correctAnswer
+            });
+          });
+        });
+      });
+    })
+    return cleanedData;
+  }
+
+
+  async getQuestionByExamIdAndNum(id: number, numQuestion: number): Promise<any> {
+    const data = await this.examRepository.createQueryBuilder('exam')
+      .leftJoinAndSelect('exam.parts', 'part')
+      .leftJoinAndSelect('part.partParagraphs', 'partParagraph', 'part.typePart = :partParagraphType', { partParagraphType: 'PART_PARAGRAPH' })
+      .leftJoinAndSelect('part.partQuestions', 'partQuestion', 'part.typePart = :partQuestionType', { partQuestionType: 'PART_QUESTION' })
+      .leftJoinAndSelect('partParagraph.paragraphs', 'paragraph')
+      .leftJoinAndSelect('paragraph.questions', 'paragraphQuestion')
+      .leftJoinAndSelect('partQuestion.questions', 'partQuestionQuestion')
+      .select(['exam.id',
+        'part.name',
+        'partParagraph.partId',
+        'partQuestion.partId',
+        'paragraph.content',
+        'paragraphQuestion.id',
+        'partQuestionQuestion.paragraphId',
+        'paragraphQuestion.numQuestion',
+        'paragraphQuestion.content',
+        'paragraphQuestion.correctAnswer',
+        'partQuestionQuestion.id',
+        'partQuestionQuestion.partQuestionId',
+        'partQuestionQuestion.numQuestion',
+        'partQuestionQuestion.content',
+        'partQuestionQuestion.correctAnswer',
+      ])
+      .where('exam.id = :id', { id: id })
+      .andWhere('(paragraphQuestion.numQuestion = :numQuestion OR partQuestionQuestion.numQuestion = :numQuestion)', { numQuestion: numQuestion })
+      .getOne();
+
+    const parts = data.parts;
+    const cleanedData = [];
+    parts.forEach(part => { // Duyệt qua mảng ban đầu
+      part.partQuestions.forEach(partQuestion => {
+        partQuestion.questions.forEach(question => {
+          cleanedData.push({
+            questionId: question.id,
+            partQuestionId: question.partQuestionId,
+            content: question.content,
+            numQuestion: question.numQuestion,
+            correctAnswer: question.correctAnswer
+          });
+        });
+      });
+
+      part.partParagraphs.forEach(paragraph => {
+        paragraph.paragraphs.forEach(paragraphQuestion => {
+          paragraphQuestion.questions.forEach(question => {
+            cleanedData.push({
+              questionId: question.id,
+              partParagraphId: question.paragraphId,
+              content: question.content,
+              numQuestion: question.numQuestion,
+              correctAnswer: question.correctAnswer
+            });
+          });
+        });
+      });
+    })
+    return cleanedData;
+  }
 
   async getResultFullTestById(id: number): Promise<any> {
     const resultStudent = await this.examRepository.createQueryBuilder('exam')
@@ -306,6 +425,7 @@ export class ExamService {
 
       .where('exam.id = :id', { id: id })
       .select(['exam.id',
+        'exam.name',
         'fullTest.id',
         'test.id',
         'test.typeOfTest',
@@ -325,6 +445,7 @@ export class ExamService {
 
     const partsInResult = resultStudent.parts;
     const dataResult = {
+      name: resultStudent.name,
       type: resultStudent.fullTests[0].test.typeOfTest,
       idTest: resultStudent.fullTests[0].test.id,
       timeStart: resultStudent.fullTests[0].test.timeStart,

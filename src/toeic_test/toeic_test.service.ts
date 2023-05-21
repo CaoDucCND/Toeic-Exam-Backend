@@ -1,9 +1,21 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ExamService } from 'src/exam/exam.service';
+import { StudentAnswer } from 'src/entities/StudentAnswer';
+import { Test } from 'src/entities/Test';
+import { Repository } from 'typeorm';
+import { Student } from 'src/entities/Student';
+import { FullTest } from 'src/entities/FullTest';
+import { Exam } from 'src/entities/Exam';
+import { async } from 'rxjs';
 
 @Injectable()
 export class ToeicTestService {
-    constructor(private examService: ExamService) { }
+    constructor(private examService: ExamService,
+        @Inject('STUDENT_REPOSITORY') private studentRepository: Repository<Student>,
+        @Inject('STUDENT_ANSWER_REPOSITORY') private studentAnswerRepository: Repository<StudentAnswer>,
+        @Inject('TEST_REPOSITORY') private testRepository: Repository<Test>,
+        @Inject('FULL_TEST_REPOSITORY') private fullTestRepository: Repository<FullTest>,
+    ) { }
 
 
 
@@ -37,71 +49,43 @@ export class ToeicTestService {
         }
     }
 
-    async saveResult(id: number, body: any): Promise<any> {
+    async saveResult(studentId: number, body: any): Promise<any> {
         // const data = await this.examService.getCorrectAnswer(id);
+        const { type, idTest, userResult, timeStart, timeEnd } = body;
+        const studentResult = userResult[0];
+        // const studentAnswers = new StudentAnswer();
+        // studentAnswers.studentId = body.studentId;
+        // studentAnswers.testId = body.testId;
+        // studentAnswers.questionId = body.questionId;
+        // studentAnswers.selectedAnswer = body.selectedAnswer;
 
-        // const userResults = body.userResult[0];
-        // const totalQuestionsInDatabase = data.length;
-        // const totalQuestionsAnswered = userResults.length;
-        // let totalScore = 0;
-        // let totalCorrect = 0;
-        // let totalIncorrect = 0;
+        const test = new Test();
+        console.log("type", type);
+        test.typeOfTest = type;
+        // test.id = idTest;
+        test.timeStart = new Date(timeStart);
+        test.timeEnd = new Date(timeEnd);
+        const savedTest = await this.testRepository.save(test);
+        console.log("savedTest", savedTest);
+        if (type === 'FULL_TEST') {
+            const fullTest = new FullTest();
+            fullTest.testId = savedTest.id;
+            fullTest.examId = idTest;
+            const savedFullTest = await this.fullTestRepository.save(fullTest);
+            console.log(savedFullTest);
+        }
+        studentResult.forEach(async (question: any) => {
+            console.log("question", question.number);
+            const foundQuestion = await this.examService.getQuestionByExamIdAndNum(idTest, question.number);
+            const studentAnswer = new StudentAnswer();
+            studentAnswer.studentId = studentId;
+            studentAnswer.testId = savedTest.id;
+            studentAnswer.questionId = foundQuestion[0].questionId;
+            studentAnswer.selectedAnswer = question.result;
+            await this.studentAnswerRepository.save(studentAnswer);
+            console.log("foundQuestion", foundQuestion);
+        })
 
-        // const totalSkipped = totalQuestionsInDatabase - totalQuestionsAnswered;
-        // // Duyệt qua từng câu trả lời của học viên
-        // userResults.forEach(userAnswer => {
-        //     const questionNumber = userAnswer.number;
-        //     const userResult = userAnswer.result;
-
-        //     // Tìm câu trả lời chính xác từ cleanedData dựa trên số câu hỏi
-        //     const correctAnswerObj = data.find(question => question.numQuestion === questionNumber);
-
-        //     if (correctAnswerObj) {
-        //         const correctAnswer = correctAnswerObj.correctAnswer;
-
-        //         if (userResult === correctAnswer) {
-        //             // Đáp án đúng, tăng điểm và số câu đúng
-        //             totalScore += 5;
-        //             totalCorrect++;
-        //         } else {
-        //             // Đáp án sai, tăng số câu sai
-        //             totalIncorrect++;
-        //         }
-        //     }
-        // });
-
-        // // Tính thời gian hoàn thành dưới dạng hh:mm:ss
-        // const timeStart = new Date(body.timeStart);
-        // const timeEnd = new Date(body.timeEnd);
-        // const timeDiff = Date.parse(body.timeEnd) - Date.parse(body.timeStart);
-        // const timeInSeconds = Math.floor(timeDiff / 1000);
-        // const hours = Math.floor(timeInSeconds / 3600);
-        // const minutes = Math.floor((timeInSeconds % 3600) / 60);
-        // const seconds = timeInSeconds % 60;
-        // const timeDoing = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
-        // // const totalQuestionsâs = totalCorrect + totalIncorrect;
-        // const percentageCorrect = (totalCorrect / totalQuestionsInDatabase) * 100;
-        // // console.log("Total questions in database:", totalQuestionsInDatabase);
-        // // console.log("Total questions answered:", totalQuestionsAnswered);
-        // // console.log("Total skipped:", totalSkipped);
-        // // console.log("Percentage correct:", percentageCorrect.toFixed(2) + "%");
-        // // console.log("Total score:", totalScore);
-        // // console.log("Total correct answers:", totalCorrect);
-        // // console.log("Total incorrect answers:", totalIncorrect);
-        // // console.log("Time taken:", formattedTime);
-        // return {
-        //     statusCode: 200,
-        //     message: 'success',
-        //     data: {
-        //         totalCorrect,
-        //         totalIncorrect,
-        //         totalSkipped,
-        //         percentageCorrect: percentageCorrect.toFixed(2),
-        //         totalScore,
-        //         timeDoing,
-        //     }
-        // }
     }
 
 
@@ -109,6 +93,7 @@ export class ToeicTestService {
     async getFullTestResult(id: number): Promise<any> {
         const resultStudent = await this.examService.getResultFullTestById(id);
         // return data;
+        const nameOfTest = resultStudent.name;
         const listCorrectAnswer = await this.examService.getCorrectAnswer(id);
         const userResults = resultStudent.userResult;
         const totalQuestionsInDatabase = listCorrectAnswer.length;
@@ -164,6 +149,7 @@ export class ToeicTestService {
             statusCode: 200,
             message: 'success',
             data: {
+                nameOfTest,
                 totalCorrect,
                 totalIncorrect,
                 totalSkipped,
