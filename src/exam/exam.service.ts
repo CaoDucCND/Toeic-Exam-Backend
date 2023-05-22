@@ -366,7 +366,8 @@ export class ExamService {
       .where(condition, { id: id })
       .andWhere('(paragraphQuestion.numQuestion = :numQuestion OR partQuestionQuestion.numQuestion = :numQuestion)', { numQuestion: numQuestion })
       .getOne();
-
+      console.log("data", data); 
+    // return data;
     const parts = data.parts;
     const cleanedData = [];
     parts.forEach(part => { // Duyệt qua mảng ban đầu

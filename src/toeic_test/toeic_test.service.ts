@@ -66,28 +66,29 @@ export class ToeicTestService {
                 skillTest.partId = idTest;
                 await this.skillTestRepository.save(skillTest);
 
-            }
-            for (const question of studentResult) {
-                const foundQuestion = await this.examService.getQuestionByExamIdAndNum(idTest, question.number, type);
-                if (!foundQuestion || foundQuestion.length === 0) {
-                    throw new Error(`Question with number ${question.number} not found.`);
+                // }
+                for (const question of studentResult) {
+                    const foundQuestion = await this.examService.getQuestionByExamIdAndNum(idTest, question.number, type);
+                    // return foundQuestion;
+                    if (!foundQuestion || foundQuestion.length === 0) {
+                        throw new Error(`Question with number ${question.number} not found.`);
+                    }
+
+                    const studentAnswer = new StudentAnswer();
+                    studentAnswer.studentId = studentId;
+                    studentAnswer.testId = savedTest.id;
+                    studentAnswer.questionId = foundQuestion[0].questionId;
+                    studentAnswer.selectedAnswer = question.result;
+                    await this.studentAnswerRepository.save(studentAnswer);
                 }
 
-                const studentAnswer = new StudentAnswer();
-                studentAnswer.studentId = studentId;
-                studentAnswer.testId = savedTest.id;
-                studentAnswer.questionId = foundQuestion[0].questionId;
-                studentAnswer.selectedAnswer = question.result;
-                await this.studentAnswerRepository.save(studentAnswer);
+
+                return {
+                    statusCode: 200,
+                    message: 'Result saved successfully.',
+                    testId: savedTest.id,
+                };
             }
-
-
-
-            return {
-                statusCode: 200,
-                message: 'Result saved successfully.',
-                testId: savedTest.id,
-            };
         } catch (error) {
             console.error(error);
             return {
@@ -271,7 +272,6 @@ export class ToeicTestService {
             .leftJoinAndSelect('studentAnswer.question', 'question') //
             .where('test.id = :id', { id: skillTestId })
             .getOne();
-
         const totalQuestionsInDatabase = await this.examService.getNumberOfQuestionByPartId(testData.skillTests[0].part.id);
         const userResult = [];
         testData.studentAnswers.forEach(item => {
@@ -370,22 +370,56 @@ export class ToeicTestService {
             .leftJoinAndSelect('partQuestionQuestion.studentAnswers', 'studentAnswerPartQuestionQuestion', 'studentAnswerPartQuestionQuestion.testId = :testId', { testId: skillTestId })
             .where('test.id = :id', { id: skillTestId })
             .getOne();
+        // return testData;
 
         const dataResult = {
             answer: [],
             studentAnswer: [],
         }
-        testData.skillTests[0].part.partQuestions[0].questions.forEach(item => {
-            dataResult.answer.push({
-                number: item.numQuestion,
-                result: item.correctAnswer,
-                transcript: item.detailAnswer?.explane || null
+        const partType = [];
+        if (testData.skillTests[0].part.partQuestions.length > 0) {
+            partType.push(testData.skillTests[0].part.partQuestions[0]);
+            partType[0].questions.forEach(item => {
+                dataResult.answer.push({
+                    number: item.numQuestion,
+                    result: item.correctAnswer,
+                    transcript: item.detailAnswer?.explane || null
+                })
+                dataResult.studentAnswer.push({
+                    number: item.numQuestion,
+                    result: item.studentAnswers[0]?.selectedAnswer || null,
+                })
             })
-            dataResult.studentAnswer.push({
-                number: item.numQuestion,
-                result: item.studentAnswers[0]?.selectedAnswer || null,
+        }
+        if (testData.skillTests[0].part.partParagraphs.length > 0) {
+            partType.push(testData.skillTests[0].part.partParagraphs[0]);
+            // return partType;
+            partType[0].paragraphs.forEach(item => {
+                item.questions.forEach(question => {
+                    dataResult.answer.push({
+                        number: question.numQuestion,
+                        result: question.correctAnswer,
+                        transcript: question.detailAnswer?.explane || null
+                    })
+                    dataResult.studentAnswer.push({
+                        number: question.numQuestion,
+                        result: question.studentAnswers[0]?.selectedAnswer || null,
+                    })
+                })
             })
-        })
+        }
+        // return partType;
+        // partType[0].questions.forEach(item => {
+        //     dataResult.answer.push({
+        //         number: item.numQuestion,
+        //         result: item.correctAnswer,
+        //         transcript: item.detailAnswer?.explane || null
+        //     })
+        //     dataResult.studentAnswer.push({
+        //         number: item.numQuestion,
+        //         result: item.studentAnswers[0]?.selectedAnswer || null,
+        //     })
+        // })
         return {
             statusCode: 200,
             message: 'success',
