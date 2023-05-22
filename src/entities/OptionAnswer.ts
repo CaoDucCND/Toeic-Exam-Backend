@@ -5,28 +5,28 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
-} from "typeorm";
-import { Question } from "./Question";
+} from 'typeorm';
+import { Question } from './Question';
 
-@Index("option_answer_fk0", ["questionId"], {})
-@Entity("option_answer", { schema: "toeic_exam" })
+@Index('option_answer_fk0', ['questionId'], {})
+@Entity('option_answer', { schema: 'toeic_exam' })
 export class OptionAnswer {
-  @PrimaryGeneratedColumn({ type: "int", name: "id" })
+  @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id: number;
 
-  @Column("int", { name: "question_id" })
+  @Column('int', { name: 'question_id' })
   questionId: number;
 
-  @Column("varchar", { name: "value", length: 2 })
+  @Column('varchar', { name: 'value', length: 2 })
   value: string;
 
-  @Column("text", { name: "content" })
+  @Column('text', { name: 'content' })
   content: string;
 
   @ManyToOne(() => Question, (question) => question.optionAnswers, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
+    onDelete: 'NO ACTION',
+    onUpdate: 'NO ACTION',
   })
-  @JoinColumn([{ name: "question_id", referencedColumnName: "id" }])
+  @JoinColumn([{ name: 'question_id', referencedColumnName: 'id' }])
   question: Question;
 }

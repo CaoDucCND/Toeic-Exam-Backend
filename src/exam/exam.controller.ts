@@ -1,11 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ExamService } from './exam.service';
 import { CreateExamDto } from './dto/create-exam.dto';
 import { UpdateExamDto } from './dto/update-exam.dto';
 
 @Controller('exam')
 export class ExamController {
-  constructor(private readonly examService: ExamService) { }
+  constructor(private readonly examService: ExamService) {}
 
   // @Post()
   // create(@Body() createExamDto: CreateExamDto) {
@@ -17,7 +25,6 @@ export class ExamController {
   //   return this.examService.findAll();
   // }
 
-
   // @Get(':id')
   // findOne(@Param('id') id: string) {
   //   return this.examService.findOne(+id);
@@ -27,7 +34,7 @@ export class ExamController {
   // findListPart(@Param('name') name: string) {
   //   console.log("checkName", name);
   //   return this.examService.getListPartByName(name);
-  // } 
+  // }
 
   // @Get('/part/:name/:id')
   // findPartById(@Param('name') name: string, @Param('id') id: string) {

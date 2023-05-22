@@ -1,32 +1,32 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Chat } from "./Chat";
-import { Feedback } from "./Feedback";
-import { Note } from "./Note";
-import { Ranking } from "./Ranking";
-import { Report } from "./Report";
-import { StudentAnswer } from "./StudentAnswer";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Chat } from './Chat';
+import { Feedback } from './Feedback';
+import { Note } from './Note';
+import { Ranking } from './Ranking';
+import { Report } from './Report';
+import { StudentAnswer } from './StudentAnswer';
 
-@Entity("student", { schema: "toeic_exam" })
+@Entity('student', { schema: 'toeic_exam' })
 export class Student {
-  @PrimaryGeneratedColumn({ type: "int", name: "id" })
+  @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id: number;
 
-  @Column("varchar", { name: "username", length: 255 })
+  @Column('varchar', { name: 'username', length: 255 })
   username: string;
 
-  @Column("varchar", { name: "password", length: 255 })
+  @Column('varchar', { name: 'password', length: 255 })
   password: string;
 
-  @Column("varchar", { name: "email", length: 255 })
+  @Column('varchar', { name: 'email', length: 255 })
   email: string;
 
-  @Column("varchar", { name: "phone", nullable: true, length: 255 })
+  @Column('varchar', { name: 'phone', nullable: true, length: 255 })
   phone: string | null;
 
-  @Column("int", { name: "dob", nullable: true })
+  @Column('int', { name: 'dob', nullable: true })
   dob: number | null;
 
-  @Column("tinyint", { name: "is_active" })
+  @Column('tinyint', { name: 'is_active' })
   isActive: number;
 
   @OneToMany(() => Chat, (chat) => chat.idStudent2)

@@ -10,4 +10,4 @@ import { DatabaseModule } from 'src/database/database.module';
   providers: [ExamService, ...ExamProviders],
   exports: [ExamService],
 })
-export class ExamModule { }
+export class ExamModule {}

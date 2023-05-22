@@ -17,10 +17,10 @@ import { MailingModule } from '../mailing/mailing.module';
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '2m' },
     }),
-    MailingModule
+    MailingModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, LocalStrategy, JwtStrategy],
   exports: [AuthService],
 })
-export class AuthModule { }
+export class AuthModule {}

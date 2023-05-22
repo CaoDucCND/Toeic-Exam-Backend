@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { UserSignupDto } from './dto/auth.signup.dto';
@@ -15,12 +19,12 @@ export class AuthService {
     private userService: UserService,
     private jwtService: JwtService,
     private maillingService: MailingService,
-  ) { }
+  ) {}
 
   async validateUser(email: string, pass: string): Promise<any> {
-    console.log("check user", email, pass);
+    console.log('check user', email, pass);
     const user = await this.userService.findOne(email);
-    console.log("check user find", user);
+    console.log('check user find', user);
     const passwordMatch = await bcrypt.compare(pass, user.password);
     if (user && passwordMatch) {
       const { password, ...result } = user;
@@ -29,7 +33,7 @@ export class AuthService {
     return null;
   }
 
-  //local strategy login 
+  //local strategy login
   async login(user: any) {
     // console.log(user);
     const payload = { username: user.username, sub: user.userId };
@@ -49,7 +53,7 @@ export class AuthService {
     if (foundUser) {
       throw new BadRequestException('Email already exists');
     }
-    console.log("check");
+    console.log('check');
 
     const user = new Student();
     user.email = email;
@@ -66,8 +70,8 @@ export class AuthService {
     // user.authProvider = AuthProvider.LOCAL;
     const savedUser = await this.userService.create(user);
     const subject = 'Verficiaction Code';
-    const content = `<p>this is default password: <b>${randomPassword}</b>. Please change password after login</p>`
-    console.log("check send mail", user.email, subject, content);
+    const content = `<p>this is default password: <b>${randomPassword}</b>. Please change password after login</p>`;
+    console.log('check send mail', user.email, subject, content);
     this.maillingService.sendMail(user.email, subject, content);
     return {
       status: 'success',

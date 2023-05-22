@@ -6,7 +6,7 @@ import { CreateUserDto } from './dto/createUser.dto';
 export class UserService {
   constructor(
     @Inject('USER_REPOSITORY') private userRepository: Repository<Student>,
-  ) { }
+  ) {}
   async findAll(): Promise<Student[]> {
     return this.userRepository.find();
   }
@@ -24,7 +24,7 @@ export class UserService {
   }
 
   async findUserByEmail(email: string): Promise<Student> {
-    console.log("check email", email);
+    console.log('check email', email);
     return await this.userRepository.findOne({ where: { email } });
   }
 

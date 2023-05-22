@@ -1,22 +1,22 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { FullTest } from "./FullTest";
-import { Part } from "./Part";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { FullTest } from './FullTest';
+import { Part } from './Part';
 
-@Entity("exam", { schema: "toeic_exam" })
+@Entity('exam', { schema: 'toeic_exam' })
 export class Exam {
-  @PrimaryGeneratedColumn({ type: "int", name: "id" })
+  @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id: number;
 
-  @Column("varchar", { name: "name", length: 255 })
+  @Column('varchar', { name: 'name', length: 255 })
   name: string;
 
-  @Column("varchar", { name: "description", nullable: true, length: 255 })
+  @Column('varchar', { name: 'description', nullable: true, length: 255 })
   description: string | null;
 
-  @Column("datetime", { name: "create_at", nullable: true })
+  @Column('datetime', { name: 'create_at', nullable: true })
   createAt: Date | null;
 
-  @Column("datetime", { name: "update_at", nullable: true })
+  @Column('datetime', { name: 'update_at', nullable: true })
   updateAt: Date | null;
 
   @OneToMany(() => FullTest, (fullTest) => fullTest.exam)

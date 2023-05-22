@@ -18,7 +18,7 @@ import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(@Request() req: any) {
@@ -26,7 +26,7 @@ export class AuthController {
   }
   @Post('signup')
   async signup(@Body() userSignupDto: UserSignupDto): Promise<any> {
-    console.log("check signup", userSignupDto);
+    console.log('check signup', userSignupDto);
     return this.authService.signup(userSignupDto);
   }
 

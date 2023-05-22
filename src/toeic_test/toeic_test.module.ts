@@ -10,4 +10,4 @@ import { DatabaseModule } from 'src/database/database.module';
   controllers: [ToeicTestController],
   providers: [ToeicTestService, ...TestProviders],
 })
-export class ToeicTestModule { }
+export class ToeicTestModule {}
