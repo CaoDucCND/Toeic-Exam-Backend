@@ -5,10 +5,12 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { PartParagraph } from "./PartParagraph";
 import { Question } from "./Question";
+import { Assets } from "./Assets";
 
 @Index("paragraph_fk0", ["partParagraphId"], {})
 @Entity("paragraph", { schema: "toeic_exam" })
@@ -31,4 +33,6 @@ export class Paragraph {
 
   @OneToMany(() => Question, (question) => question.paragraph)
   questions: Question[];
+  @OneToOne(() => Assets, (assets) => assets.paragraph)
+  assets: Assets;
 }

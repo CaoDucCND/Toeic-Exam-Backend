@@ -4,9 +4,11 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { Question } from "./Question";
+import { Paragraph } from "./Paragraph";
 
 @Index("assets_fk0", ["idQuestion"], {})
 @Entity("assets", { schema: "toeic_exam" })
@@ -16,6 +18,9 @@ export class Assets {
 
   @Column("int", { name: "id_question" })
   idQuestion: number;
+
+  @Column("int", { name: "paragraph_id" })
+  paragraphId: number;
 
   @Column("enum", { primary: true, name: "type", enum: ["AUDIO", "IMAGE"] })
   type: "AUDIO" | "IMAGE";
@@ -29,4 +34,11 @@ export class Assets {
   })
   @JoinColumn([{ name: "id_question", referencedColumnName: "id" }])
   idQuestion2: Question;
+
+  @OneToOne(() => Paragraph, (paragraph) => paragraph.assets, {
+    onDelete: "NO ACTION",
+    onUpdate: "NO ACTION",
+  })
+  @JoinColumn([{ name: "paragraph_id", referencedColumnName: "id" }])
+  paragraph: Paragraph;
 }
