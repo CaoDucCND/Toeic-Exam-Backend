@@ -9,7 +9,7 @@ export class ToeicTestController {
     return this.toeicTestService.getFullTest();
   }
   //luu dư lieu
-  @Post('/full-test/result/:id')
+  @Post('/result/:id')
   async saveResult(@Param('id') id: string, @Body() body: any) {
     console.log("result");
     return this.toeicTestService.saveResult(+id, body);
@@ -17,7 +17,7 @@ export class ToeicTestController {
   //lay dulieu
   @Get('/full-test/result/:id')
   async getFullTestResult(@Param('id') id: string) {
-    console.log("result");
+    console.log("result full test result");
     return this.toeicTestService.getFullTestResult(+id);
   }
 
@@ -40,11 +40,6 @@ export class ToeicTestController {
   }
 
 
-  @Post('/skill-test/result/:id')
-  async saveResultSkillTest(@Param('id') id: string, @Body() body: any) {
-    console.log("result");
-    return this.toeicTestService.saveResult(+id, body);
-  }
   //lay dulieu
 
 

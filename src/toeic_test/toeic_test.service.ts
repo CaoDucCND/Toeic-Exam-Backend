@@ -21,15 +21,7 @@ export class ToeicTestService {
 
 
 
-    async getDetailAswerByExamId(id: number) {
-        console.log(id);
-        const res = await this.examService.getDetailAswerByExamId(id);
-        return {
-            statusCode: 200,
-            message: 'Get detil Answer test successfully',
-            data: res ? res : []
-        }
-    }
+
 
     async getFullTest(): Promise<any> {
         const listExam = await this.examService.findAll();
@@ -73,11 +65,10 @@ export class ToeicTestService {
                 skillTest.testId = savedTest.id;
                 skillTest.partId = idTest;
                 await this.skillTestRepository.save(skillTest);
+
             }
-
             for (const question of studentResult) {
-                const foundQuestion = await this.examService.getQuestionByExamIdAndNum(idTest, question.number);
-
+                const foundQuestion = await this.examService.getQuestionByExamIdAndNum(idTest, question.number, type);
                 if (!foundQuestion || foundQuestion.length === 0) {
                     throw new Error(`Question with number ${question.number} not found.`);
                 }
@@ -89,6 +80,8 @@ export class ToeicTestService {
                 studentAnswer.selectedAnswer = question.result;
                 await this.studentAnswerRepository.save(studentAnswer);
             }
+
+
 
             return {
                 statusCode: 200,
@@ -107,20 +100,40 @@ export class ToeicTestService {
 
     async getFullTestResult(id: number): Promise<any> {
         try {
-            const resultStudent = await this.examService.getResultFullTestById(id);
+            // const resultStudent = await this.examService.getResultFullTestById(id);
             // return data;
-            const nameOfTest = resultStudent.name;
-            const listCorrectAnswer = await this.examService.getCorrectAnswer(id);
-            const userResults = resultStudent.userResult;
-            const totalQuestionsInDatabase = listCorrectAnswer.length;
-            const totalQuestionsAnswered = userResults.filter(item => item.result !== null).length;
+            const NUM_OF_QUESTION = 200;
+            const testData = await this.testRepository.createQueryBuilder('test')
+                .leftJoinAndSelect('test.fullTests', 'fullTest')
+                .leftJoinAndSelect('fullTest.exam', 'exam')
+                .leftJoinAndSelect('test.studentAnswers', 'studentAnswer')
+                .leftJoinAndSelect('studentAnswer.question', 'question') //
+                .where('test.id = :id', { id })
+                .getOne();
+            const userResult = [];
+            testData.studentAnswers.forEach(item => {
+                userResult.push({
+                    number: item.question.numQuestion,
+                    result: item.selectedAnswer
+                })
+            })
+
+            const listCorrectAnswer = testData.studentAnswers.map((answer) => {
+                return {
+                    numQuestion: answer.question.numQuestion,
+                    correctAnswer: answer.question.correctAnswer,
+                };
+            });
+            // const userResults = resultStudent.userResult;
+            const totalQuestionsInDatabase = NUM_OF_QUESTION;
+            const totalQuestionsAnswered = userResult.filter(item => item.result !== null).length;
             let totalScore = 0;
             let totalCorrect = 0;
             let totalIncorrect = 0;
 
             const totalSkipped = totalQuestionsInDatabase - totalQuestionsAnswered;
             // Duyệt qua từng câu trả lời của học viên
-            userResults.forEach(userAnswer => {
+            userResult.forEach(userAnswer => {
                 const questionNumber = userAnswer.number;
                 const userResult = userAnswer.result;
 
@@ -142,9 +155,8 @@ export class ToeicTestService {
             });
 
             // Tính thời gian hoàn thành dưới dạng hh:mm:ss
-            const timeStart = new Date(resultStudent.timeStart);
-            const timeEnd = new Date(resultStudent.timeEnd);
-            const timeDiff = Date.parse(resultStudent.timeEnd) - Date.parse(resultStudent.timeStart);
+            const nameOfTest = testData.fullTests[0].exam.name || null;
+            const timeDiff = Date.parse(testData.timeEnd.toString()) - Date.parse(testData.timeStart.toString());
             const timeInSeconds = Math.floor(timeDiff / 1000);
             const hours = Math.floor(timeInSeconds / 3600);
             const minutes = Math.floor((timeInSeconds % 3600) / 60);
@@ -153,6 +165,8 @@ export class ToeicTestService {
 
             // const totalQuestionsâs = totalCorrect + totalIncorrect;
             const percentageCorrect = (totalCorrect / totalQuestionsInDatabase) * 100;
+
+
 
             return {
                 statusCode: 200,
@@ -167,6 +181,70 @@ export class ToeicTestService {
                     timeDoing,
                 }
             }
+
+
+
+            // const nameOfTest = resultStudent.name;
+            // const listCorrectAnswer = await this.examService.getCorrectAnswer(id);
+            // const userResults = resultStudent.userResult;
+            // const totalQuestionsInDatabase = listCorrectAnswer.length;
+            // const totalQuestionsAnswered = userResults.filter(item => item.result !== null).length;
+            // let totalScore = 0;
+            // let totalCorrect = 0;
+            // let totalIncorrect = 0;
+
+            // const totalSkipped = totalQuestionsInDatabase - totalQuestionsAnswered;
+            // // Duyệt qua từng câu trả lời của học viên
+            // userResults.forEach(userAnswer => {
+            //     const questionNumber = userAnswer.number;
+            //     const userResult = userAnswer.result;
+            //     console.log("user result", userResult);
+            //     // Tìm câu trả lời chính xác từ cleanedData dựa trên số câu hỏi
+            //     const correctAnswerObj = listCorrectAnswer.find(question => question.numQuestion === questionNumber);
+            //     console.log(correctAnswerObj);
+            //     if (correctAnswerObj) {
+            //         const correctAnswer = correctAnswerObj.correctAnswer;
+
+            //         if (userResult === correctAnswer) {
+            //             // Đáp án đúng, tăng điểm và số câu đúng
+            //             totalScore += 5; ``
+            //             totalCorrect++;
+            //         } else {
+            //             // Đáp án sai, tăng số câu sai
+            //             totalIncorrect++;
+            //         }
+            //     }
+            // });
+
+            // // Tính thời gian hoàn thành dưới dạng hh:mm:ss
+            // const timeStart = new Date(resultStudent.timeStart);
+            // const timeEnd = new Date(resultStudent.timeEnd);
+            // const timeDiff = Date.parse(resultStudent.timeEnd) - Date.parse(resultStudent.timeStart);
+            // const timeInSeconds = Math.floor(timeDiff / 1000);
+            // const hours = Math.floor(timeInSeconds / 3600);
+            // const minutes = Math.floor((timeInSeconds % 3600) / 60);
+            // const seconds = timeInSeconds % 60;
+            // const timeDoing = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+            // // const totalQuestionsâs = totalCorrect + totalIncorrect;
+            // const percentageCorrect = (totalCorrect / totalQuestionsInDatabase) * 100;
+
+            // return {
+            //     statusCode: 200,
+            //     message: 'success',
+            //     data: {
+            //         nameOfTest,
+            //         totalCorrect,
+            //         totalIncorrect,
+            //         totalSkipped,
+            //         percentageCorrect: percentageCorrect.toFixed(2),
+            //         totalScore,
+            //         timeDoing,
+            //     }
+            // }
+
+
+
         } catch (error) {
             if (error instanceof NotFoundException) {
                 return {
@@ -175,13 +253,14 @@ export class ToeicTestService {
                     data: null
                 };
             }
-
+            console.log(error);
             return {
                 statusCode: 500,
                 message: 'Internal server error'
             };
         }
     }
+
 
 
     async getSkillTestResult(skillTestId: number): Promise<any> {
@@ -193,6 +272,7 @@ export class ToeicTestService {
             .where('test.id = :id', { id: skillTestId })
             .getOne();
 
+        const totalQuestionsInDatabase = await this.examService.getNumberOfQuestionByPartId(testData.skillTests[0].part.id);
         const userResult = [];
         testData.studentAnswers.forEach(item => {
             userResult.push({
@@ -208,7 +288,7 @@ export class ToeicTestService {
             };
         });
         // const userResults = resultStudent.userResult;
-        const totalQuestionsInDatabase = listCorrectAnswer.length;
+        // const totalQuestionsInDatabase = listCorrectAnswer.length;
         const totalQuestionsAnswered = userResult.filter(item => item.result !== null).length;
         let totalScore = 0;
         let totalCorrect = 0;
@@ -267,29 +347,117 @@ export class ToeicTestService {
     }
 
     async getSkillTestResultDetail(skillTestId: number): Promise<any> {
+        // const testData = await this.testRepository.createQueryBuilder('test')
+        //     .leftJoinAndSelect('test.skillTests', 'skillTest')
+        //     .leftJoinAndSelect('skillTest.part', 'part')
+        //     .leftJoinAndSelect('test.studentAnswers', 'studentAnswer') //
+        //     .leftJoinAndSelect('studentAnswer.question', 'question') //
+        //     .leftJoinAndSelect('question.detailAnswer', 'detailAnswer') //
+        //     .where('test.id = :id', { id: skillTestId })
+        //     .getOne();
+
         const testData = await this.testRepository.createQueryBuilder('test')
             .leftJoinAndSelect('test.skillTests', 'skillTest')
             .leftJoinAndSelect('skillTest.part', 'part')
-            .leftJoinAndSelect('test.studentAnswers', 'studentAnswer') //
-            .leftJoinAndSelect('studentAnswer.question', 'question') //
-            .leftJoinAndSelect('question.detailAnswer', 'detailAnswer') //
+            .leftJoinAndSelect('part.partParagraphs', 'partParagraph', 'part.typePart = :partParagraphType', { partParagraphType: 'PART_PARAGRAPH' })
+            .leftJoinAndSelect('part.partQuestions', 'partQuestion', 'part.typePart = :partQuestionType', { partQuestionType: 'PART_QUESTION' })
+            .leftJoinAndSelect('partParagraph.paragraphs', 'paragraph')
+            .leftJoinAndSelect('paragraph.questions', 'paragraphQuestion')
+            .leftJoinAndSelect('partQuestion.questions', 'partQuestionQuestion')
+            .leftJoinAndSelect('paragraphQuestion.detailAnswer', 'detailAnswerParagraphQuestion')
+            .leftJoinAndSelect('partQuestionQuestion.detailAnswer', 'detailAnswerPartQuestionQuestion')
+            .leftJoinAndSelect('paragraphQuestion.studentAnswers', 'studentAnswerParagraphQuestion', 'studentAnswerParagraphQuestion.testId = :testId', { testId: skillTestId })
+            .leftJoinAndSelect('partQuestionQuestion.studentAnswers', 'studentAnswerPartQuestionQuestion', 'studentAnswerPartQuestionQuestion.testId = :testId', { testId: skillTestId })
             .where('test.id = :id', { id: skillTestId })
             .getOne();
+
         const dataResult = {
             answer: [],
             studentAnswer: [],
         }
-        testData.studentAnswers.forEach(item => {
+        testData.skillTests[0].part.partQuestions[0].questions.forEach(item => {
             dataResult.answer.push({
-                number: item.question.numQuestion,
-                result: item.question.correctAnswer,
-                transcript: item.question.detailAnswer?.explane || null
+                number: item.numQuestion,
+                result: item.correctAnswer,
+                transcript: item.detailAnswer?.explane || null
             })
             dataResult.studentAnswer.push({
-                number: item.question.numQuestion,
-                result: item.selectedAnswer,
+                number: item.numQuestion,
+                result: item.studentAnswers[0]?.selectedAnswer || null,
             })
         })
+        return {
+            statusCode: 200,
+            message: 'success',
+            data: dataResult
+        }
+    }
+
+    async getDetailAswerByExamId(fullTestId: number) {
+        const testData = await this.testRepository.createQueryBuilder('test')
+            .leftJoinAndSelect('test.fullTests', 'fullTest')
+            .leftJoinAndSelect('fullTest.exam', 'exam')
+            .leftJoinAndSelect('exam.parts', 'part')
+            .leftJoinAndSelect('part.partParagraphs', 'partParagraph', 'part.typePart = :partParagraphType', { partParagraphType: 'PART_PARAGRAPH' })
+            .leftJoinAndSelect('part.partQuestions', 'partQuestion', 'part.typePart = :partQuestionType', { partQuestionType: 'PART_QUESTION' })
+            .leftJoinAndSelect('partParagraph.paragraphs', 'paragraph')
+            .leftJoinAndSelect('paragraph.questions', 'paragraphQuestion')
+            .leftJoinAndSelect('partQuestion.questions', 'partQuestionQuestion')
+            .leftJoinAndSelect('paragraphQuestion.detailAnswer', 'detailAnswerParagraphQuestion')
+            .leftJoinAndSelect('partQuestionQuestion.detailAnswer', 'detailAnswerPartQuestionQuestion')
+            .leftJoinAndSelect('paragraphQuestion.studentAnswers', 'studentAnswerParagraphQuestion', 'studentAnswerParagraphQuestion.testId = :testId', { testId: fullTestId })
+            .leftJoinAndSelect('partQuestionQuestion.studentAnswers', 'studentAnswerPartQuestionQuestion', 'studentAnswerPartQuestionQuestion.testId = :testId', { testId: fullTestId })
+            .where('test.id = :id', { id: fullTestId })
+            .getOne();
+
+        const dataResult = {
+            answer: [],
+            studentAnswer: [],
+        }
+        testData.fullTests[0].exam.parts.forEach(part => {
+            // dataResult.answer.push({
+            //     number: item.numQuestion,
+            //     result: item.correctAnswer,
+            //     transcript: item.detailAnswer?.explane || null
+            // })
+            // dataResult.studentAnswer.push({
+            //     number: item.numQuestion,
+            //     result: item.studentAnswers[0]?.selectedAnswer || null,
+            // })
+            // parts.forEach(part => {
+            part.partQuestions.forEach(partQuestion => {
+                partQuestion.questions.forEach(question => {
+                    dataResult.answer.push({
+                        number: question.numQuestion,
+                        result: question.correctAnswer,
+                        transcript: question.detailAnswer?.explane || null
+                    });
+
+                    dataResult.studentAnswer.push({
+                        number: question.numQuestion,
+                        result: question.studentAnswers[0]?.selectedAnswer || null,
+                    });
+
+                });
+            });
+
+            part.partParagraphs.forEach(paragraph => {
+                paragraph.paragraphs.forEach(paragraphQuestion => {
+                    paragraphQuestion.questions.forEach(question => {
+                        dataResult.answer.push({
+                            number: question.numQuestion,
+                            result: question.correctAnswer,
+                            transcript: question.detailAnswer?.explane || null
+                        });
+                        dataResult.studentAnswer.push({
+                            number: question.numQuestion,
+                            result: question.studentAnswers[0]?.selectedAnswer || null,
+                        });
+                    });
+                });
+            });
+        });
+
         return {
             statusCode: 200,
             message: 'success',
@@ -314,5 +482,4 @@ export class ToeicTestService {
             data: exam ? exam : {}
         }
     }
-
 }
