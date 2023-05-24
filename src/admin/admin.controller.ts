@@ -29,6 +29,12 @@ export class AdminController {
     }
   ))
   uploadFile(@UploadedFiles() files: { image?: Express.Multer.File[], audio?: Express.Multer.File[] }, @Body() body: any) {
+    if (!files) {
+      return {
+        status: 404,
+        message: 'No file uploaded',
+      }
+    }
     return this.adminService.uploadExam(body, files);
   }
 }

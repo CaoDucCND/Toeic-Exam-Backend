@@ -14,6 +14,7 @@ import { Question } from 'src/entities/Question';
 import { OptionAnswer } from 'src/entities/OptionAnswer';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
+import { file } from 'googleapis/build/src/apis/file';
 
 
 @Injectable()
@@ -34,6 +35,12 @@ export class AdminService {
     try {
       console.log("admin");
       console.log('fiels', files);
+      if (!files.excel || !files.image || !files.audio) {
+        return {
+          statusCode: 401,
+          message: 'unexpected file',
+        }
+      }
       // console.log('body', body);
       // return;
       const results: any[] = [];
