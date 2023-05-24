@@ -619,31 +619,48 @@ export class ToeicTestService {
   }
 
   async getHistory(id: number): Promise<any> {
-    const data = await this.testRepository.createQueryBuilder('test')
+
+    const data = await this.studentAnswerRepository.createQueryBuilder('studentAnswer')
+      .leftJoinAndSelect('studentAnswer.test', 'test')
+      .leftJoinAndSelect('studentAnswer.student', 'student')
       .leftJoinAndSelect('test.fullTests', 'fullTest')
       .leftJoinAndSelect('fullTest.exam', 'exam')
-      .leftJoinAndSelect('test.studentAnswers', 'studentAnswer')
-      .leftJoinAndSelect('studentAnswer.student', 'student')
       .where('studentAnswer.studentId = :id', { id })
-      .getOne();
+      .groupBy('test.id, fullTest.id, exam.id') // Nhóm theo các trường test.id, fullTest.id và exam.id
+      .select([
+        'MAX(studentAnswer.id) AS id',
+        'test',
+        'student',
+        'fullTest',
+        'exam'
+      ])
+      .getRawMany();
 
-    if (!data) {
-      return {
-        statusCode: 200,
-        message: 'Get history successfully',
-        data: {},
+
+    const listHistory = [];
+    data.forEach(element => {
+      const timeDiff =
+        Date.parse(element.test_time_end.toString()) -
+        Date.parse(element.test_time_start.toString());
+      const timeInSeconds = Math.floor(timeDiff / 1000);
+      const hours = Math.floor(timeInSeconds / 3600);
+      const minutes = Math.floor((timeInSeconds % 3600) / 60);
+      const seconds = timeInSeconds % 60;
+      const timeDoing = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds
+        .toString()
+        .padStart(2, '0')}`;
+      const res = {
+        id: element.test_id,
+        timeDoing,
+        name: element.exam_name,
+        score: element.test_score,
       }
-    }
-    const result = {
-      id: data.id,
-      timeDoing: new Date(data.timeStart).toLocaleDateString(),
-      name: data.fullTests[0].exam.name,
-      score: data.score,
-    }
+      listHistory.push(res);
+    });
     return {
       statusCode: 200,
       message: 'Get history successfully',
-      data: result ? result : {},
+      data: listHistory ? listHistory : {},
     }
   }
 }
