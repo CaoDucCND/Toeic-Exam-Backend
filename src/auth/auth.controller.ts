@@ -15,10 +15,11 @@ import { LocalAuthGuard } from './guards/auth.local.guard';
 import { JwtAuthGuard } from './guards/auth.jwt.guard';
 import { UserSignupDto } from './dto/auth.signup.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { ChangePassDto } from './dto/changePass.dto';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(@Request() req: any) {
@@ -34,5 +35,9 @@ export class AuthController {
   @Get('profile')
   getProfile(@Request() req) {
     return req.user;
+  }
+  @Patch('changePass')
+  changePassword(@Body() changePassDto: ChangePassDto): Promise<any> {
+    return this.authService.changePassword(changePassDto);
   }
 }

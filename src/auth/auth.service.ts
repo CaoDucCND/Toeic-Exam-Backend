@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
@@ -12,6 +13,7 @@ import * as generator from 'generate-password';
 import * as bcrypt from 'bcrypt';
 import { MailingService } from '../mailing/mailing.service';
 import { AuthProvider } from './auth.constants';
+import { ChangePassDto } from './dto/changePass.dto';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +21,7 @@ export class AuthService {
     private userService: UserService,
     private jwtService: JwtService,
     private maillingService: MailingService,
-  ) {}
+  ) { }
 
   async validateUser(email: string, pass: string): Promise<any> {
     console.log('check user', email, pass);
@@ -82,53 +84,36 @@ export class AuthService {
         email: savedUser.email,
       },
     };
-  }
 
-  //google strategy login
-  // async googleLogin(req: any) {
-  //   if (!req.user) {
-  //     throw new BadRequestException('No user from google');
-  //   }
-  //   const foundUser = await this.userService.findUserByEmail(req.user.email);
-  //   if (foundUser) {
-  //     if (foundUser.authProvider !== AuthProvider.GOOGLE) {
-  //       throw new BadRequestException(
-  //         `email ${req.user.email} is already used by another auth provider`,
-  //       );
-  //     }
-  //     else {
-  //       const payload = { username: foundUser.username, sub: 12 };
-  //       return {
-  //         status: 'success',
-  //         data: {
-  //           userId: foundUser.userId,
-  //           access_token: this.jwtService.sign(payload),
-  //           userName: foundUser.username,
-  //           avatarURL: foundUser.avatarUrl,
-  //           payment: 'free',
-  //         },
-  //       };
-  //     }
-  //   }
-  //   else {
-  //     const user = new User();
-  //     user.email = req.user.email;
-  //     user.username = req.user.email.split('@')[0];
-  //     user.password = 'google_auth';
-  //     user.isActive = 1;
-  //     user.authProvider = AuthProvider.GOOGLE;
-  //     const savedUser = await this.userService.create(user);
-  //     const payload = { username: savedUser.username, sub: savedUser.userId };
-  //     return {
-  //       status: 'success',
-  //       data: {
-  //         userId: savedUser.userId,
-  //         access_token: this.jwtService.sign(payload),
-  //         userName: savedUser.username,
-  //         avatarURL: savedUser.avatarUrl,
-  //         payment: 'free',
-  //       },
-  //     };
-  //   }
-  // }
+  }
+  async changePassword(changePassDto: ChangePassDto): Promise<any> {
+    console.log('check change passs', changePassDto);
+    const foundUser = await this.userService.findUserByEmail(
+      changePassDto.email,
+    );
+    if (!foundUser) {
+      throw new NotFoundException('user not exist');
+    }
+    //found user
+    const passwordMatch = await bcrypt.compare(
+      changePassDto.currentPassword,
+      foundUser.password,
+    );
+    if (!passwordMatch) {
+      throw new BadRequestException('old password incorrect');
+    }
+    const hashedPassword = await bcrypt.hash(changePassDto.newPassword, 10);
+    const inforUpdateReturn = await this.userService.updatePasswordById(
+      foundUser.id,
+      hashedPassword,
+    );
+    if (inforUpdateReturn.affected > 0) {
+      return {
+        statusCode: '200',
+        message: 'success',
+      };
+    } else {
+      throw new InternalServerErrorException();
+    }
+  }
 }

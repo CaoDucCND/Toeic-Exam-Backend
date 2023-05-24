@@ -6,7 +6,7 @@ import { CreateUserDto } from './dto/createUser.dto';
 export class UserService {
   constructor(
     @Inject('USER_REPOSITORY') private userRepository: Repository<Student>,
-  ) {}
+  ) { }
   async findAll(): Promise<Student[]> {
     return this.userRepository.find();
   }
@@ -30,5 +30,8 @@ export class UserService {
 
   async deleteUserByEmail(email: string): Promise<any> {
     return await this.userRepository.delete({ email });
+  }
+  async updatePasswordById(id: number, newPassword: string): Promise<any> {
+    return this.userRepository.update(id, { password: newPassword });
   }
 }
