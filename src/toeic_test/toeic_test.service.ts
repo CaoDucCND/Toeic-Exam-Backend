@@ -652,6 +652,7 @@ export class ToeicTestService {
       const res = {
         id: element.test_id,
         timeDoing,
+        timeStart: new Date(element.test_time_start).toLocaleString(),
         name: element.exam_name,
         score: element.test_score,
       }
