@@ -7,6 +7,7 @@ import { ToeicTestModule } from './toeic_test/toeic_test.module';
 import { ExamModule } from './exam/exam.module';
 import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from '@nestjs/config';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ConfigModule } from '@nestjs/config';
     ExamModule,
     DatabaseModule,
     AuthModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],
