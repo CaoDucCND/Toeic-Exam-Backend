@@ -5,9 +5,15 @@ import { UpdateAdminDto } from './dto/update-admin.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import * as path from 'path';
+import { ExamService } from 'src/exam/exam.service';
 @Controller('admin')
 export class AdminController {
-  constructor(private readonly adminService: AdminService) { }
+  constructor(private readonly adminService: AdminService,private readonly examService: ExamService) { }
+
+@Get('exam')
+  async getAllExam() {
+    return this.examService.findAll();
+  }
 
   @Post('exam')
   @UseInterceptors(FileFieldsInterceptor([

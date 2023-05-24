@@ -617,4 +617,26 @@ export class ToeicTestService {
       data: exam ? exam : {},
     };
   }
+
+  async getHistory(id: number): Promise<any> {
+    const data = await this.testRepository.createQueryBuilder('test')
+      .leftJoinAndSelect('test.fullTests', 'fullTest')
+      .leftJoinAndSelect('fullTest.exam', 'exam')
+      .leftJoinAndSelect('test.studentAnswers', 'studentAnswer')
+      .leftJoinAndSelect('studentAnswer.student', 'student')
+      .where('studentAnswer.studentId = :id', { id })
+      .getOne();
+
+    const result = {
+      id: data.id,
+      timeDoing: new Date(data.timeStart).toLocaleDateString(),
+      name: data.fullTests[0].exam.name,
+      score: data.score,
+    }
+    return {
+      statusCode: 200,
+      message: 'Get history successfully',
+      data: result ? result : {},
+    }
+  }
 }

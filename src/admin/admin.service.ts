@@ -49,7 +49,7 @@ export class AdminService {
       // return;
       const results: any[] = [];
       const exam = new Exam();
-      exam.name = "ETS 2023 Test 1";
+      exam.name = body.name || "ETS 2023 Test";
       exam.createAt = new Date();
       exam.updateAt = new Date();
       const savedExam = await this.examRepository.save(exam);
@@ -383,12 +383,12 @@ export class AdminService {
 
   async getStudent() {
     const students = await this.userService.findAll();
-    
+
     const modifiedStudents = students.map(student => {
       const { password, ...rest } = student;
       return rest;
     });
-  
+
     return {
       statusCode: 200,
       message: 'Get student success',

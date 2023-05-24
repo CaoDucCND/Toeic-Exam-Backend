@@ -4,6 +4,10 @@ import { ToeicTestService } from './toeic_test.service';
 @Controller('tests')
 export class ToeicTestController {
   constructor(private readonly toeicTestService: ToeicTestService) {}
+  @Get('history/:id')
+  async getHistory(@Param('id') id: string) {
+    return this.toeicTestService.getHistory(+id);
+  }
   @Get('/full-test')
   async getFullTest() {
     return this.toeicTestService.getFullTest();
