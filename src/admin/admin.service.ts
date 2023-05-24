@@ -15,11 +15,13 @@ import { OptionAnswer } from 'src/entities/OptionAnswer';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { file } from 'googleapis/build/src/apis/file';
+import { UserService } from 'src/user/user.service';
 
 
 @Injectable()
 export class AdminService {
   constructor(
+    private readonly userService: UserService,
     private readonly configService: ConfigService,
     @Inject('EXAM_REPOSITORY') private examRepository: Repository<Exam>,
     @Inject('PART_REPOSITORY') private partRepository: Repository<Part>,
@@ -29,6 +31,7 @@ export class AdminService {
     @Inject('QUESTION_REPOSITORY') private questionRepository: Repository<Question>,
     @Inject('ASSET_REPOSITORY') private assetRepository: Repository<Assets>,
     @Inject('OPTION_REPOSITORY') private optionAnswerRepository: Repository<OptionAnswer>
+
   ) { }
 
   async uploadExam(body: any, files: any) {
@@ -376,6 +379,21 @@ export class AdminService {
         message: 'Upload fail',
       }
     }
+  }
+
+  async getStudent() {
+    const students = await this.userService.findAll();
+    
+    const modifiedStudents = students.map(student => {
+      const { password, ...rest } = student;
+      return rest;
+    });
+  
+    return {
+      statusCode: 200,
+      message: 'Get student success',
+      data: modifiedStudents,
+    };
   }
 
 }

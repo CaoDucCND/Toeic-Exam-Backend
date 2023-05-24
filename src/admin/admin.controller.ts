@@ -37,4 +37,9 @@ export class AdminController {
     }
     return this.adminService.uploadExam(body, files);
   }
+
+  @Get('student')
+  async getAllStudent(){
+    return this.adminService.getStudent();
+  }
 }
