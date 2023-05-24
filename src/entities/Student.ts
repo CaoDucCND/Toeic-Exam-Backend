@@ -23,8 +23,8 @@ export class Student {
   @Column('varchar', { name: 'phone', nullable: true, length: 255 })
   phone: string | null;
 
-  @Column('int', { name: 'dob', nullable: true })
-  dob: number | null;
+  @Column('date', { name: 'dob', nullable: true })
+  dob: Date | null;
 
   @Column('tinyint', { name: 'is_active' })
   isActive: number;
