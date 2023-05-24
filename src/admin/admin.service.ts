@@ -32,9 +32,9 @@ export class AdminService {
 
   async uploadExam(body: any, files: any) {
     try {
-      console.log('fiels', files);
-      console.log('body', body);
       console.log("admin");
+      console.log('fiels', files);
+      // console.log('body', body);
       // return;
       const results: any[] = [];
       const exam = new Exam();
@@ -77,6 +77,7 @@ export class AdminService {
           listPartParagraph.push(savedPartParagraph);
         }
       }
+      console.log("path===", files.excel[0].path)
       // return { listPart, listPartParagraph, listPartQuestion };
       await new Promise((resolve, reject) => {
         fs.createReadStream(files.excel[0].path)
