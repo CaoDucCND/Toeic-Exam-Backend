@@ -34,6 +34,7 @@ export class AdminService {
   async uploadExam(body: any, files: any) {
     try {
       console.log("admin");
+      console.log('body', body);
       console.log('fiels', files);
       if (!files.excel || !files.image || !files.audio) {
         return {
