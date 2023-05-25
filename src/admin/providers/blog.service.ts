@@ -16,4 +16,7 @@ export class BlogService {
     async create(blog: Blog): Promise<Blog> {
         return await this.blogRepository.save(blog)
     }
+    async delete(id: number): Promise<any> {
+        return await this.blogRepository.delete({ id: id })
+    }
 }

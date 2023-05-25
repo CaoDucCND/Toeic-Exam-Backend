@@ -437,4 +437,18 @@ export class AdminService {
     };
   }
 
+  async deleteBlog(id: number) {
+    const dataReturn = await this.blogService.delete(id);
+    if (dataReturn.affected === 0) {
+      return {
+        statusCode: 404,
+        message: 'Blog not found',
+      }
+    }
+    return {
+      statusCode: 200,
+      message: 'Delete blog success',
+      data: dataReturn,
+    }
+  }
 }

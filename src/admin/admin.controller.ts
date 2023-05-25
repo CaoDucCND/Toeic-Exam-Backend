@@ -61,5 +61,9 @@ export class AdminController {
   async createBlog(@Body() body: any) {
     return this.adminService.createBlog(body);
   }
+  @Delete('blog/:id')
+  async deleteBlog(@Param('id') id: string) {
+    return this.adminService.deleteBlog(+id);
+  }
 
 }
