@@ -409,6 +409,16 @@ export class AdminService {
       data: blogs,
     };
   }
+
+  async getBlogById(id: number) {
+    const blog = await this.blogService.findOne(id);
+
+    return {
+      statusCode: 200,
+      message: 'Get blog success',
+      data: blog,
+    };
+  }
   async createBlog(body: any) {
     const { title, content } = body;
 

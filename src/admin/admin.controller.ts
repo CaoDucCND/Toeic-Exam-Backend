@@ -53,9 +53,13 @@ export class AdminController {
   async getAllBlog() {
     return this.adminService.getBlogs();
   }
+  @Get('blog/:id')
+  async getBlogById(@Param('id') id: string) {
+    return this.adminService.getBlogById(+id);
+  }
   @Post('blog')
   async createBlog(@Body() body: any) {
     return this.adminService.createBlog(body);
   }
-  
+
 }

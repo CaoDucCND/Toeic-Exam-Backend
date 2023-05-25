@@ -10,6 +10,9 @@ export class BlogService {
     async findAll(): Promise<Blog[]> {
         return await this.blogRepository.find()
     }
+    async findOne(id: number): Promise<Blog> {
+        return await this.blogRepository.findOne({ where: { id: id } })
+    }
     async create(blog: Blog): Promise<Blog> {
         return await this.blogRepository.save(blog)
     }

@@ -619,6 +619,11 @@ export class ToeicTestService {
   }
 
   async getHistory(id: number): Promise<any> {
+
+const data2 = await this.studentAnswerRepository.createQueryBuilder('studentAnswer')
+      .leftJoinAndSelect('studentAnswer.test', 'test')
+
+
     const data = await this.testRepository.createQueryBuilder('test')
       .leftJoinAndSelect('test.fullTests', 'fullTest')
       .leftJoinAndSelect('fullTest.exam', 'exam')
