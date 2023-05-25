@@ -213,7 +213,6 @@ export class ToeicTestService {
 
       // const totalQuestionsâs = totalCorrect + totalIncorrect;
       const percentageCorrect = (totalCorrect / totalQuestionsInDatabase) * 100;
-
       return {
         statusCode: 200,
         message: 'success',
@@ -228,64 +227,6 @@ export class ToeicTestService {
         },
       };
 
-      // const nameOfTest = resultStudent.name;
-      // const listCorrectAnswer = await this.examService.getCorrectAnswer(id);
-      // const userResults = resultStudent.userResult;
-      // const totalQuestionsInDatabase = listCorrectAnswer.length;
-      // const totalQuestionsAnswered = userResults.filter(item => item.result !== null).length;
-      // let totalScore = 0;
-      // let totalCorrect = 0;
-      // let totalIncorrect = 0;
-
-      // const totalSkipped = totalQuestionsInDatabase - totalQuestionsAnswered;
-      // // Duyệt qua từng câu trả lời của học viên
-      // userResults.forEach(userAnswer => {
-      //     const questionNumber = userAnswer.number;
-      //     const userResult = userAnswer.result;
-      //     console.log("user result", userResult);
-      //     // Tìm câu trả lời chính xác từ cleanedData dựa trên số câu hỏi
-      //     const correctAnswerObj = listCorrectAnswer.find(question => question.numQuestion === questionNumber);
-      //     console.log(correctAnswerObj);
-      //     if (correctAnswerObj) {
-      //         const correctAnswer = correctAnswerObj.correctAnswer;
-
-      //         if (userResult === correctAnswer) {
-      //             // Đáp án đúng, tăng điểm và số câu đúng
-      //             totalScore += 5; ``
-      //             totalCorrect++;
-      //         } else {
-      //             // Đáp án sai, tăng số câu sai
-      //             totalIncorrect++;
-      //         }
-      //     }
-      // });
-
-      // // Tính thời gian hoàn thành dưới dạng hh:mm:ss
-      // const timeStart = new Date(resultStudent.timeStart);
-      // const timeEnd = new Date(resultStudent.timeEnd);
-      // const timeDiff = Date.parse(resultStudent.timeEnd) - Date.parse(resultStudent.timeStart);
-      // const timeInSeconds = Math.floor(timeDiff / 1000);
-      // const hours = Math.floor(timeInSeconds / 3600);
-      // const minutes = Math.floor((timeInSeconds % 3600) / 60);
-      // const seconds = timeInSeconds % 60;
-      // const timeDoing = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
-      // // const totalQuestionsâs = totalCorrect + totalIncorrect;
-      // const percentageCorrect = (totalCorrect / totalQuestionsInDatabase) * 100;
-
-      // return {
-      //     statusCode: 200,
-      //     message: 'success',
-      //     data: {
-      //         nameOfTest,
-      //         totalCorrect,
-      //         totalIncorrect,
-      //         totalSkipped,
-      //         percentageCorrect: percentageCorrect.toFixed(2),
-      //         totalScore,
-      //         timeDoing,
-      //     }
-      // }
     } catch (error) {
       if (error instanceof NotFoundException) {
         return {
@@ -619,13 +560,13 @@ export class ToeicTestService {
   }
 
   async getHistory(id: number): Promise<any> {
-
     const data = await this.studentAnswerRepository.createQueryBuilder('studentAnswer')
       .leftJoinAndSelect('studentAnswer.test', 'test')
       .leftJoinAndSelect('studentAnswer.student', 'student')
       .leftJoinAndSelect('test.fullTests', 'fullTest')
       .leftJoinAndSelect('fullTest.exam', 'exam')
       .where('studentAnswer.studentId = :id', { id })
+      .andWhere('test.typeOfTest = :type', { type: 'FULL_TEST' })
       .groupBy('test.id, fullTest.id, exam.id') // Nhóm theo các trường test.id, fullTest.id và exam.id
       .select([
         'MAX(studentAnswer.id) AS id',
@@ -635,10 +576,10 @@ export class ToeicTestService {
         'exam'
       ])
       .getRawMany();
-
+    // return data;
 
     const listHistory = [];
-    data.forEach(element => {
+    for (const element of data) {
       const timeDiff =
         Date.parse(element.test_time_end.toString()) -
         Date.parse(element.test_time_start.toString());
@@ -646,18 +587,19 @@ export class ToeicTestService {
       const hours = Math.floor(timeInSeconds / 3600);
       const minutes = Math.floor((timeInSeconds % 3600) / 60);
       const seconds = timeInSeconds % 60;
-      const timeDoing = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds
-        .toString()
-        .padStart(2, '0')}`;
+      const timeDoing = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      const resultScore = await this.getFullTestResult(element.test_id);
       const res = {
         id: element.test_id,
         timeDoing,
         timeStart: new Date(element.test_time_start).toLocaleString(),
         name: element.exam_name,
-        score: element.test_score,
-      }
+        score: resultScore.data.totalScore,
+      };
       listHistory.push(res);
-    });
+    }
+    // console.log("listHistory: ", listHistory);
+
     return {
       statusCode: 200,
       message: 'Get history successfully',
