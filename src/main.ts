@@ -10,7 +10,7 @@ async function bootstrap() {
   app.useStaticAssets(path.join(__dirname, '..', 'uploads'));
   console.log(path.join(__dirname, '..', 'uploads'));
   const corsOptions: CorsOptions = {
-    origin: 'http://localhost:3000', // add rontend url here
+    origin: 'http://fe.tinhoccaogiaphat.com', // add rontend url here
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: 'Content-Type, Accept',
     credentials: true,
