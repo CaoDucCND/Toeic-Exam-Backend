@@ -8,9 +8,9 @@ import * as path from 'path';
 import { ExamService } from 'src/exam/exam.service';
 @Controller('admin')
 export class AdminController {
-  constructor(private readonly adminService: AdminService,private readonly examService: ExamService) { }
+  constructor(private readonly adminService: AdminService, private readonly examService: ExamService) { }
 
-@Get('exam')
+  @Get('exam')
   async getAllExam() {
     return this.examService.findAll();
   }
@@ -45,7 +45,17 @@ export class AdminController {
   }
 
   @Get('student')
-  async getAllStudent(){
+  async getAllStudent() {
     return this.adminService.getStudent();
   }
+
+  @Get('blog')
+  async getAllBlog() {
+    return this.adminService.getBlogs();
+  }
+  @Post('blog')
+  async createBlog(@Body() body: any) {
+    return this.adminService.createBlog(body);
+  }
+  
 }

@@ -627,6 +627,13 @@ export class ToeicTestService {
       .where('studentAnswer.studentId = :id', { id })
       .getOne();
 
+    if (!data) {
+      return {
+        statusCode: 200,
+        message: 'Get history successfully',
+        data: {},
+      }
+    }
     const result = {
       id: data.id,
       timeDoing: new Date(data.timeStart).toLocaleDateString(),

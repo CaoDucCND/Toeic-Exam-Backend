@@ -5,10 +5,11 @@ import { ExamModule } from 'src/exam/exam.module';
 import { AdminProviders } from './providers/admin.providers';
 import { DatabaseModule } from 'src/database/database.module';
 import { UserModule } from 'src/user/user.module';
+import { BlogService } from './providers/blog.service';
 
 @Module({
   imports: [ExamModule, DatabaseModule, UserModule, ExamModule],
   controllers: [AdminController],
-  providers: [AdminService, ...AdminProviders],
+  providers: [AdminService, BlogService, ...AdminProviders],
 })
-export class AdminModule {}
+export class AdminModule { }

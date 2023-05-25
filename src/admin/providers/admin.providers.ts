@@ -7,6 +7,7 @@ import { Paragraph } from "src/entities/Paragraph";
 import { OptionAnswer } from "src/entities/OptionAnswer";
 import { PartParagraph } from "src/entities/PartParagraph";
 import { PartQuestion } from "src/entities/PartQuestion";
+import { Blog } from "src/entities/Blog";
 
 export const AdminProviders = [
     {
@@ -47,6 +48,11 @@ export const AdminProviders = [
     {
         provide: 'OPTION_REPOSITORY',
         useFactory: (dataSource: DataSource) => dataSource.getRepository(OptionAnswer),
+        inject: ['DATA_SOURCE'],
+    },
+    {
+        provide: 'BLOG_REPOSITORY',
+        useFactory: (dataSource: DataSource) => dataSource.getRepository(Blog),
         inject: ['DATA_SOURCE'],
     }
 ]

@@ -16,6 +16,9 @@ import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { file } from 'googleapis/build/src/apis/file';
 import { UserService } from 'src/user/user.service';
+import { async } from 'rxjs';
+import { BlogService } from './providers/blog.service';
+import { Blog } from 'src/entities/Blog';
 
 
 @Injectable()
@@ -23,6 +26,7 @@ export class AdminService {
   constructor(
     private readonly userService: UserService,
     private readonly configService: ConfigService,
+    private readonly blogService: BlogService,
     @Inject('EXAM_REPOSITORY') private examRepository: Repository<Exam>,
     @Inject('PART_REPOSITORY') private partRepository: Repository<Part>,
     @Inject('PARTQUESTION_REPOSITORY') private partQuestionRepository: Repository<PartQuestion>,
@@ -393,6 +397,33 @@ export class AdminService {
       statusCode: 200,
       message: 'Get student success',
       data: modifiedStudents,
+    };
+  }
+
+  async getBlogs() {
+    const blogs = await this.blogService.findAll();
+
+    return {
+      statusCode: 200,
+      message: 'Get blogs success',
+      data: blogs,
+    };
+  }
+  async createBlog(body: any) {
+    const { title, content } = body;
+
+    const blog = new Blog();
+    blog.idAdmin = 1;
+    blog.title = title;
+    blog.content = content;
+    blog.createAt = new Date();
+    blog.updatedAt = new Date();
+
+    const savedBlog = await this.blogService.create(blog);
+    return {
+      statusCode: 200,
+      message: 'Create blog success',
+      data: savedBlog,
     };
   }
 

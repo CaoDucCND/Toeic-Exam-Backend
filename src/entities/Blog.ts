@@ -26,8 +26,8 @@ export class Blog {
   @Column('datetime', { name: 'create_at' })
   createAt: Date;
 
-  @Column('int', { name: 'updated_at' })
-  updatedAt: number;
+  @Column('datetime', { name: 'updated_at' })
+  updatedAt: Date;
 
   @ManyToOne(() => Admin, (admin) => admin.blogs, {
     onDelete: 'NO ACTION',
