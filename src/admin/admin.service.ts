@@ -92,7 +92,7 @@ export class AdminService {
           listPartParagraph.push(savedPartParagraph);
         }
       }
-      console.log("path===", files.excel[0].path)
+      // console.log("path===", files.excel[0].path)
       // return { listPart, listPartParagraph, listPartQuestion };
       await new Promise((resolve, reject) => {
         fs.createReadStream(files.excel[0].path)
@@ -141,7 +141,7 @@ export class AdminService {
           //Part3
           else if (i >= 31 && i < 70) {
             if (questionCounter === 0) {
-              console.log("listPartParagraph[0]", listPartParagraph[0]);
+              // console.log("listPartParagraph[0]", listPartParagraph[0]);
               const paragraph = new Paragraph();
               paragraph.content = results[i].paragraph;
               paragraph.partParagraphId = listPartParagraph[0].id;
@@ -213,7 +213,7 @@ export class AdminService {
           //Part7
           else if (i >= 146 && i < 150) {
             if (questionCounter === 0) {
-              console.log("listPartParagraph[0]", listPartParagraph[3]);
+              // console.log("listPartParagraph[0]", listPartParagraph[3]);
               const paragraph = new Paragraph();
               paragraph.content = results[i].paragraph;
               paragraph.partParagraphId = listPartParagraph[0].id;
@@ -365,7 +365,7 @@ export class AdminService {
             optionAnswerD.questionId = listsavedQuestion[0][i].id;
             listOptionAnswer.push(optionAnswerD);
           }
-          console.log('i===', i);
+          // console.log('i===', i);
         }
 
         Promise.all([this.assetRepository.save(listAsesst), this.optionAnswerRepository.save(listOptionAnswer)]);
