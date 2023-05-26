@@ -191,12 +191,16 @@ export class AdminService {
           }
           //Part6
           else if (i >= 130 && i < 146) {
+            console.log("part6, counterQ: ", questionCounter);
+
             if (questionCounter === 0) {
               // console.log("listPartParagraph[0]", listPartParagraph[2]);
+              console.log("paragraph: ", results[i].paragraph);
               const paragraph = new Paragraph();
               paragraph.content = results[i].paragraph;
-              paragraph.partParagraphId = listPartParagraph[0].id;
+              paragraph.partParagraphId = listPartParagraph[2].id;
               savedParagraph = await this.paragraphRepository.save(paragraph);
+              console.log("savedParagraph: ", savedParagraph);
             }
             const question = new Question();
             question.paragraphId = savedParagraph.id;
@@ -216,7 +220,7 @@ export class AdminService {
               // console.log("listPartParagraph[0]", listPartParagraph[3]);
               const paragraph = new Paragraph();
               paragraph.content = results[i].paragraph;
-              paragraph.partParagraphId = listPartParagraph[0].id;
+              paragraph.partParagraphId = listPartParagraph[3].id;
               savedParagraph = await this.paragraphRepository.save(paragraph);
             }
             const question = new Question();
@@ -236,7 +240,7 @@ export class AdminService {
               // console.log("listPartParagraph[0]", listPartParagraph[3]);
               const paragraph = new Paragraph();
               paragraph.content = results[i].paragraph;
-              paragraph.partParagraphId = listPartParagraph[0].id;
+              paragraph.partParagraphId = listPartParagraph[3].id;
               savedParagraph = await this.paragraphRepository.save(paragraph);
             }
             const question = new Question();
@@ -256,7 +260,7 @@ export class AdminService {
               // console.log("listPartParagraph[0]", listPartParagraph[3]);
               const paragraph = new Paragraph();
               paragraph.content = results[i].paragraph;
-              paragraph.partParagraphId = listPartParagraph[0].id;
+              paragraph.partParagraphId = listPartParagraph[3].id;
               savedParagraph = await this.paragraphRepository.save(paragraph);
             }
             const question = new Question();
@@ -276,7 +280,7 @@ export class AdminService {
               // console.log("listPartParagraph[0]", listPartParagraph[3]);
               const paragraph = new Paragraph();
               paragraph.content = results[i].paragraph;
-              paragraph.partParagraphId = listPartParagraph[0].id;
+              paragraph.partParagraphId = listPartParagraph[3].id;
               savedParagraph = await this.paragraphRepository.save(paragraph);
             }
             const question = new Question();
