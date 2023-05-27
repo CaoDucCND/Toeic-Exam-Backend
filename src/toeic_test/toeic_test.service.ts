@@ -60,10 +60,10 @@ export class ToeicTestService {
         fullTest.examId = idTest;
         await this.fullTestRepository.save(fullTest);
 
-        const skillTest = new SkillTest();
-        skillTest.testId = savedTest.id;
-        skillTest.partId = idTest;
-        await this.skillTestRepository.save(skillTest);
+        // const skillTest = new SkillTest();
+        // skillTest.testId = savedTest.id;
+        // skillTest.partId = idTest;
+        // await this.skillTestRepository.save(skillTest);
 
         for (const question of studentResult) {
           const foundQuestion =
